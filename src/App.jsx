@@ -30,9 +30,7 @@ function App() {
   }, []);
 
   return (
-    <main className="container">
-      <Theme systems={systems} orientation={orientation} />
-    </main>
+    <Theme systems={systems} orientation={orientation} />
   );
 }
 

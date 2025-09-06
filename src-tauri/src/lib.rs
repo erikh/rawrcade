@@ -72,7 +72,7 @@ impl Default for System {
 			name: "Default System".into(),
 			description: None,
 			photo: None,
-			gamelist: Vec::new(),
+			gamelist: vec![Game::default()],
 		}
 	}
 }
