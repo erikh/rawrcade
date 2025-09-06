@@ -1,6 +1,7 @@
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use tauri::{Manager, State};
 use tokio::sync::Mutex;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -53,6 +54,15 @@ pub struct System {
 	pub gamelist: Vec<Game>,
 }
 
+impl System {
+	pub fn default_template(name: &str) -> Self {
+		Self {
+			name: name.to_string(),
+			..Default::default()
+		}
+	}
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct Game {
@@ -79,10 +89,23 @@ impl Default for System {
 	}
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct App {
 	pub all_systems: Arc<Mutex<Vec<System>>>,
-	pub orientation: Orientation,
+	pub orientation: Arc<Mutex<Orientation>>,
+}
+
+impl Default for App {
+	fn default() -> Self {
+		Self {
+			all_systems: Arc::new(Mutex::new(vec![
+				System::default_template("First System"),
+				System::default_template("Second System"),
+				System::default_template("Third System"),
+			])),
+			orientation: Arc::new(Mutex::new(Orientation::default())),
+		}
+	}
 }
 
 impl App {
@@ -90,36 +113,67 @@ impl App {
 		while let Ok(event) = self.next_event().await {
 			match event.typ {
 				EventType::Input(e) => {
-					tracing::trace!("input event: {:?}", e)
+					tracing::trace!("input event: {:?}", e);
+					match e {
+						InputEvent::Right => {
+							let len =
+								self.all_systems.lock().await.len() - 1;
+							let mut lock =
+								self.orientation.lock().await;
+							if lock.system_index >= len {
+								lock.system_index = 0;
+							} else {
+								lock.system_index += 1;
+							}
+						}
+						InputEvent::Left => {
+							let len =
+								self.all_systems.lock().await.len() - 1;
+							let mut lock =
+								self.orientation.lock().await;
+							if lock.system_index == 0 {
+								lock.system_index = len;
+							} else {
+								lock.system_index -= 1;
+							}
+						}
+						_ => {}
+					}
 				}
 			}
 		}
 	}
 
 	pub async fn next_event(&self) -> Result<Event> {
+		tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+
 		Ok(Event {
-			typ: EventType::Input(InputEvent::Up),
+			typ: EventType::Input(InputEvent::Right),
 		})
 	}
 }
 
 #[tauri::command]
-fn all_systems() -> Vec<System> {
-	vec![System::default()]
+async fn all_systems(
+	state: State<'_, App>,
+) -> std::result::Result<Vec<System>, ()> {
+	Ok(state.all_systems.clone().lock_owned().await.clone())
 }
 
 #[tauri::command]
-fn current_orientation() -> Option<Orientation> {
-	Some(Orientation::default())
+async fn current_orientation(
+	state: State<'_, App>,
+) -> std::result::Result<Orientation, ()> {
+	Ok(state.orientation.clone().lock_owned().await.clone())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let app = App::default();
-	let inner = app.clone();
+	let appdata = App::default();
+	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()
-		.with_max_level(tracing::Level::INFO) // Set the maximum level to log
+		.with_max_level(tracing::Level::TRACE) // Set the maximum level to log
 		.init();
 
 	tauri::async_runtime::spawn(
@@ -127,6 +181,10 @@ pub fn run() {
 	);
 
 	tauri::Builder::default()
+		.setup(|app| {
+			app.manage(appdata);
+			Ok(())
+		})
 		.plugin(tauri_plugin_opener::init())
 		.invoke_handler(tauri::generate_handler![
 			all_systems,
