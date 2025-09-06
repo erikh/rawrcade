@@ -47,6 +47,7 @@ pub struct Orientation {
 #[serde(rename_all = "snake_case")]
 pub struct System {
 	pub name: String,
+	pub tag: String,
 	pub description: Option<String>,
 	pub photo: Option<String>,
 	pub gamelist: Vec<Game>,
@@ -70,6 +71,7 @@ impl Default for System {
 	fn default() -> Self {
 		Self {
 			name: "Default System".into(),
+			tag: "default".into(),
 			description: None,
 			photo: None,
 			gamelist: vec![Game::default()],
