@@ -23,3 +23,7 @@ tauri-plugin-opener = "*"
 serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 gilrs = "*"
+anyhow = "*"
+tokio = { version = "*", features = [ "full" ] }
+tracing = "*"
+tracing-subscriber = "*"
