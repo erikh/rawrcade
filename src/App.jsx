@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import Theme from "./Theme";
 
 function App() {
   const [systems, setSystems] = useState([]);
@@ -28,11 +29,7 @@ function App() {
 
   return (
     <main className="container">
-      <div>
-        {orientation && systems.length > 0
-          ? systems[orientation.system_index].name
-          : "No Systems Loaded"}
-      </div>
+      <Theme systems={systems} orientation={orientation} />
     </main>
   );
 }
