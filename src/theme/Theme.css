@@ -29,3 +29,12 @@ img.system-banner {
   height: 8em;
   max-width: auto;
 }
+
+div.game {
+  color: white;
+}
+
+div.selected {
+  color: black;
+  background-color: #ccc;
+}

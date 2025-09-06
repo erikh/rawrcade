@@ -16,7 +16,7 @@ function Theme(props){
         <div class="section system-info">
           <Grid container spacing={2}>
             <Grid size={4}>
-              <Box class="system-banner">
+              <Box className="system-banner">
                 {current_system ?
                   <img class="system-banner" src={`theme/${current_system.tag}.png`} />
                   : <React.Fragment />
@@ -24,7 +24,7 @@ function Theme(props){
               </Box>
             </Grid>
             <Grid size={8}>
-              <Box class="system-title">
+              <Box className="system-title">
                 {orientation && systems.length > 0
                   ? systems[orientation.system_index].name
                   : "No Systems Loaded"}
@@ -33,11 +33,17 @@ function Theme(props){
           </Grid>
         </div>
         <div class="section">
-          <Box>
-            {orientation && systems.length > 0
-              ? systems[orientation.system_index].gamelist[orientation.gamelist_index].name
+            {current_system
+              ? (
+                <Stack spacing={2}>
+                  {current_system.gamelist.map((x, i) => {
+                    orientation.gamelist_index == i ?
+                      <div class="game selected">{x.name}</div>
+                      : <div class="game not-selected">{x.name}</div>
+                  })}
+                </Stack>
+              )
               : "No Game List Loaded"}
-          </Box>
         </div>
       </Stack>
     </Container>

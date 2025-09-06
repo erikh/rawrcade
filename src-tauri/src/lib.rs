@@ -55,9 +55,15 @@ pub struct System {
 }
 
 impl System {
-	pub fn default_template(name: &str) -> Self {
+	pub fn default_template(name: &str, gamelist: Vec<&str>) -> Self {
 		Self {
 			name: name.to_string(),
+			gamelist: gamelist
+				.iter()
+				.map(|name| Game {
+					name: name.to_string(),
+				})
+				.collect(),
 			..Default::default()
 		}
 	}
@@ -99,9 +105,18 @@ impl Default for App {
 	fn default() -> Self {
 		Self {
 			all_systems: Arc::new(Mutex::new(vec![
-				System::default_template("First System"),
-				System::default_template("Second System"),
-				System::default_template("Third System"),
+				System::default_template(
+					"First System",
+					vec!["Game One", "Game Two", "Game Three"],
+				),
+				System::default_template(
+					"Second System",
+					vec!["Game One", "Game Two", "Game Three"],
+				),
+				System::default_template(
+					"Third System",
+					vec!["Game One", "Game Two", "Game Three"],
+				),
 			])),
 			orientation: Arc::new(Mutex::new(Orientation::default())),
 		}
@@ -147,8 +162,14 @@ impl App {
 	pub async fn next_event(&self) -> Result<Event> {
 		tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
+		let input = if rand::random::<bool>() {
+			InputEvent::Right
+		} else {
+			InputEvent::Left
+		};
+
 		Ok(Event {
-			typ: EventType::Input(InputEvent::Right),
+			typ: EventType::Input(input),
 		})
 	}
 }

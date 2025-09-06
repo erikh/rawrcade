@@ -27,3 +27,4 @@ anyhow = "*"
 tokio = { version = "*", features = [ "full" ] }
 tracing = "*"
 tracing-subscriber = "*"
+rand = "*"
