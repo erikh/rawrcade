@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-
 function Theme(...props){
   const orientation = props.orientation;
   const systems = props.systems;
