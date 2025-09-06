@@ -34,11 +34,13 @@ pub struct Event {
 	pub typ: EventType,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Orientation {
-	Next,
-	Previous,
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct Orientation {
+	pub system_index: usize,
+	pub gamelist_index: usize,
+	pub menu_active: bool,
+	pub menu_index: Option<usize>,
+	pub menu_item_index: Option<usize>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,6 +49,21 @@ pub struct System {
 	pub name: String,
 	pub description: Option<String>,
 	pub photo: Option<String>,
+	pub gamelist: Vec<Game>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct Game {
+	pub name: String,
+}
+
+impl Default for Game {
+	fn default() -> Self {
+		Self {
+			name: "Default Game".into(),
+		}
+	}
 }
 
 impl Default for System {
@@ -55,21 +72,24 @@ impl Default for System {
 			name: "Default System".into(),
 			description: None,
 			photo: None,
+			gamelist: Vec::new(),
 		}
 	}
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct App {
-	pub current_system: Arc<Mutex<System>>,
 	pub all_systems: Arc<Mutex<Vec<System>>>,
+	pub orientation: Orientation,
 }
 
 impl App {
 	pub async fn event_loop(&self) {
 		while let Ok(event) = self.next_event().await {
 			match event.typ {
-				EventType::Input(e) => tracing::info!("{:?}", e),
+				EventType::Input(e) => {
+					tracing::trace!("input event: {:?}", e)
+				}
 			}
 		}
 	}
@@ -82,8 +102,13 @@ impl App {
 }
 
 #[tauri::command]
-fn current_system() -> System {
-	System::default()
+fn all_systems() -> Vec<System> {
+	vec![System::default()]
+}
+
+#[tauri::command]
+fn current_orientation() -> Option<Orientation> {
+	Some(Orientation::default())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -101,7 +126,10 @@ pub fn run() {
 
 	tauri::Builder::default()
 		.plugin(tauri_plugin_opener::init())
-		.invoke_handler(tauri::generate_handler![current_system])
+		.invoke_handler(tauri::generate_handler![
+			all_systems,
+			current_orientation
+		])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");
 }

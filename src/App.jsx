@@ -3,25 +3,36 @@ import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
 function App() {
-  const [system, setSystem] = useState("");
+  const [systems, setSystems] = useState([]);
+  const [orientation, setOrientation] = useState(null);
 
-  async function getSystem() {
-    setSystem(await invoke("current_system"));
+  async function getSystems() {
+    setSystems(await invoke("all_systems"));
+  }
+
+  async function getOrientation() {
+    setOrientation(await invoke("current_orientation"));
   }
 
   useEffect(() => {
-    const id = setInterval(() => nextEvent(), 50);
+    getSystems();
+    const id = setInterval(() => getSystems(), 1000);
     return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
-    const id = setInterval(() => getSystem(), 50);
+    getOrientation();
+    const id = setInterval(() => getOrientation(), 50);
     return () => clearInterval(id);
   }, []);
 
   return (
     <main className="container">
-      <div>{system.name}</div>
+      <div>
+        {orientation && systems.length > 0
+          ? systems[orientation.system_index].name
+          : "No Systems Loaded"}
+      </div>
     </main>
   );
 }
