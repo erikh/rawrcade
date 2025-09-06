@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
-import Theme from "./Theme";
+import Theme from "./theme/Theme";
 
 function App() {
   const [systems, setSystems] = useState([]);
