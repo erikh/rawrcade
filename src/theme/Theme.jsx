@@ -20,7 +20,7 @@ function GameList(props) {
       {
         list.map((x, i) => {
           return current == i ?
-            <div class="game selected">{x.name}</div>
+            <div class="game selected"><span class="arrow">►</span>{"  "}{x.name}</div>
             : <div class="game not-selected">{x.name}</div>
       })
       }
@@ -34,7 +34,7 @@ function Theme(props){
   const current_system = systems.length > 0 && systems[orientation.system_index];
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="100%">
       <Stack spacing={2}>
         <div class="section system-info">
           <Grid container spacing={2}>

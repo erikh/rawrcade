@@ -1,4 +1,5 @@
 body {
+  margin: 2em;
   background-color: black;
 }
 
@@ -30,20 +31,27 @@ img.system-banner {
   max-width: auto;
 }
 
-div.game {
+.game {
   text-align: start;
   padding-left: 2em;
   padding-right: 2em;
   color: white;
-  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-div.game.not-selected {
+.not-selected {
   color: black;
 }
 
-div.game.selected {
-  border: 1px solid black;
-  background-color: #444;
+.selected {
+  border: 1px solid #aaa;
+  background-color: #384862;
   border-radius: 5px;
+  box-shadow: 5px 5px 15px #444;
+}
+
+.arrow {
+  font-size: 0.75em;
+  vertical-align: middle;
 }
