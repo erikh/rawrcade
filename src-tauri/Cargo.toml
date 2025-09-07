@@ -28,3 +28,4 @@ tokio = { version = "*", features = [ "full" ] }
 tracing = "*"
 tracing-subscriber = "*"
 rand = "*"
+serde-xml-rs = "*"
