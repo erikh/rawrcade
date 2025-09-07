@@ -210,7 +210,7 @@ impl App {
 	}
 
 	pub async fn next_event(&self) -> Result<Event> {
-		tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+		tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
 		let input = match rand::random::<u8>() % 4 {
 			2 => InputEvent::Right,
