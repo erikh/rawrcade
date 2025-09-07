@@ -5,10 +5,33 @@ import Stack from "@mui/system/Stack";
 import Grid from "@mui/system/Grid";
 import './Theme.css';
 
+const NO_GAME_LIST = () => { <div>No Game List Provided</div> };
+
+function GameList(props) {
+  const list = props.list;
+  const current = props.current;
+
+  if (list.length == 0) {
+    return <NO_GAME_LIST />;
+  }
+
+  return (
+    <React.Fragment>
+      {
+        list.map((x, i) => {
+          return current == i ?
+            <div class="game selected">{x.name}</div>
+            : <div class="game not-selected">{x.name}</div>
+      })
+      }
+    </React.Fragment>
+  )
+}
+
 function Theme(props){
   const orientation = props.orientation;
   const systems = props.systems;
-  const current_system = orientation && systems.length > 0 ? systems[orientation.system_index] : null;
+  const current_system = systems.length > 0 && systems[orientation.system_index];
 
   return (
     <Container maxWidth="sm">
@@ -33,17 +56,12 @@ function Theme(props){
           </Grid>
         </div>
         <div class="section">
-            {current_system
-              ? (
-                <Stack spacing={2}>
-                  {current_system.gamelist.map((x, i) => {
-                    orientation.gamelist_index == i ?
-                      <div class="game selected">{x.name}</div>
-                      : <div class="game not-selected">{x.name}</div>
-                  })}
-                </Stack>
-              )
-              : "No Game List Loaded"}
+          {
+            current_system ?
+            <GameList list={current_system.gamelist} current={orientation.gamelist_index} />
+            :
+            <NO_GAME_LIST />
+          }
         </div>
       </Stack>
     </Container>

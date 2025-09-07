@@ -55,9 +55,12 @@ pub struct System {
 }
 
 impl System {
-	pub fn default_template(name: &str, gamelist: Vec<&str>) -> Self {
+	pub fn default_template(
+		name: &str, tag: &str, gamelist: Vec<&str>,
+	) -> Self {
 		Self {
 			name: name.to_string(),
+			tag: tag.to_string(),
 			gamelist: gamelist
 				.iter()
 				.map(|name| Game {
@@ -106,16 +109,31 @@ impl Default for App {
 		Self {
 			all_systems: Arc::new(Mutex::new(vec![
 				System::default_template(
-					"First System",
-					vec!["Game One", "Game Two", "Game Three"],
+					"Nintendo",
+					"nes",
+					vec![
+						"Super Mario Brothers",
+						"Deadly Towers",
+						"Karnov",
+					],
 				),
 				System::default_template(
-					"Second System",
-					vec!["Game One", "Game Two", "Game Three"],
+					"Super Nintendo",
+					"snes",
+					vec![
+						"Bubsy",
+						"Street Fighter 2",
+						"Legend of Zelda: A Link to the Past",
+					],
 				),
 				System::default_template(
-					"Third System",
-					vec!["Game One", "Game Two", "Game Three"],
+					"Sony Playstation",
+					"psx",
+					vec![
+						"Metal Gear Solid",
+						"Castlevania: Symphony of the Night",
+						"Banjo Kazooie",
+					],
 				),
 			])),
 			orientation: Arc::new(Mutex::new(Orientation::default())),
@@ -140,6 +158,8 @@ impl App {
 							} else {
 								lock.system_index += 1;
 							}
+
+							lock.gamelist_index = 0;
 						}
 						InputEvent::Left => {
 							let len =
@@ -150,6 +170,36 @@ impl App {
 								lock.system_index = len;
 							} else {
 								lock.system_index -= 1;
+							}
+
+							lock.gamelist_index = 0;
+						}
+						InputEvent::Up => {
+							let mut lock =
+								self.orientation.lock().await;
+							let len = self.all_systems.lock().await
+								[lock.system_index]
+								.gamelist
+								.len() - 1;
+
+							if lock.gamelist_index == 0 {
+								lock.gamelist_index = len;
+							} else {
+								lock.gamelist_index -= 1;
+							}
+						}
+						InputEvent::Down => {
+							let mut lock =
+								self.orientation.lock().await;
+							let len = self.all_systems.lock().await
+								[lock.system_index]
+								.gamelist
+								.len() - 1;
+
+							if lock.gamelist_index == len {
+								lock.gamelist_index = 0;
+							} else {
+								lock.gamelist_index += 1;
 							}
 						}
 						_ => {}
@@ -162,10 +212,11 @@ impl App {
 	pub async fn next_event(&self) -> Result<Event> {
 		tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
-		let input = if rand::random::<bool>() {
-			InputEvent::Right
-		} else {
-			InputEvent::Left
+		let input = match rand::random::<u8>() % 4 {
+			2 => InputEvent::Right,
+			1 => InputEvent::Left,
+			0 => InputEvent::Up,
+			_ => InputEvent::Down,
 		};
 
 		Ok(Event {
