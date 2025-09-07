@@ -47,11 +47,13 @@ function Theme(props){
               </Box>
             </Grid>
             <Grid size={8}>
-              <Box className="system-title">
-                {orientation && systems.length > 0
-                  ? systems[orientation.system_index].name
-                  : "No Systems Loaded"}
-              </Box>
+                <div class="system-title">
+                    <div class="vertical-spacer" />
+                      {orientation && systems.length > 0
+                        ? systems[orientation.system_index].name
+                        : "No Systems Loaded"}
+                    <div class="vertical-spacer" />
+                </div>
             </Grid>
           </Grid>
         </div>

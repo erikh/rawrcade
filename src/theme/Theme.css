@@ -13,22 +13,27 @@ div.section {
 }
 
 div.system-info {
-  height: 8em;
+  height: 20%;
 }
 
 div.system-banner {
-  height: 8em;
+  height: 20%;
 }
 
 .system-title {
-  padding-top: 1.25em;
+  height: 100%;
+  background-color: #666;
   font-size: 2em;
   text-align: center;
+  color: white;
+  border-radius: 5px;
+  border: 1px solid #222;
 }
 
 img.system-banner {
-  height: 8em;
+  height: 200px;
   max-width: auto;
+  border-radius: 5px;
 }
 
 .game {
@@ -54,4 +59,9 @@ img.system-banner {
 .arrow {
   font-size: 0.75em;
   vertical-align: middle;
+}
+
+.vertical-spacer {
+  margin: 0;
+  padding: 1em;
 }
