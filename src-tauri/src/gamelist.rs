@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
@@ -8,6 +9,14 @@ pub struct GameList {
 	game: Vec<ESGame>,
 	#[serde(default, skip_serializing_if = "Vec::is_empty")]
 	folder: Vec<Folder>,
+}
+
+impl GameList {
+	pub fn from_file(filename: PathBuf) -> Result<Self> {
+		Ok(quick_xml::de::from_reader(std::io::BufReader::new(
+			std::fs::OpenOptions::new().read(true).open(filename)?,
+		))?)
+	}
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -61,15 +70,6 @@ mod tests {
 
 	#[test]
 	fn test_parse_xml() {
-		eprintln!("{}", std::env::current_dir().unwrap().display());
-
-		let f = std::fs::OpenOptions::new()
-			.read(true)
-			.open("test-gamelist.xml")
-			.unwrap();
-
-		let br = std::io::BufReader::new(f);
-
-		let _: GameList = quick_xml::de::from_reader(br).unwrap();
+		GameList::from_file("test-gamelist.xml".into()).unwrap();
 	}
 }
