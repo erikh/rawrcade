@@ -28,7 +28,7 @@ tokio = { version = "*", features = [ "full" ] }
 tracing = "*"
 tracing-subscriber = "*"
 rand = "*"
-serde-xml-rs = "*"
+quick-xml = { version = "*", features = [ "serialize" ] }
 
 [dev-dependencies]
 xml = "*"

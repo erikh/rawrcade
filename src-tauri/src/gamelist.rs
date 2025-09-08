@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameList {
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	game: Option<ESGame>,
-	#[serde(default, skip_serializing_if = "Option::is_none")]
-	folder: Option<Folder>,
+	#[serde(default, skip_serializing_if = "Vec::is_empty")]
+	game: Vec<ESGame>,
+	#[serde(default, skip_serializing_if = "Vec::is_empty")]
+	folder: Vec<Folder>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -36,9 +36,9 @@ pub struct ESGame {
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	video: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	rating: Option<f32>,
+	rating: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	releasedate: Option<std::time::SystemTime>,
+	releasedate: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	developer: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
@@ -46,20 +46,18 @@ pub struct ESGame {
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	genre: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	players: Option<u8>,
+	players: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	playcount: Option<usize>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	lastplayed: Option<std::time::SystemTime>,
+	lastplayed: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	sortname: Option<String>,
 }
 
 #[cfg(test)]
 mod tests {
-	use super::GameList;
-	use serde::Deserialize;
-	use serde_xml_rs::de::Deserializer;
+	use crate::GameList;
 
 	#[test]
 	fn test_parse_xml() {
@@ -70,12 +68,8 @@ mod tests {
 			.open("test-gamelist.xml")
 			.unwrap();
 
-		let res = GameList::deserialize(
-			&mut Deserializer::new_from_reader(f),
-		);
+		let br = std::io::BufReader::new(f);
 
-		if let Err(e) = res {
-			eprintln!("{}", e.to_string())
-		}
+		let _: GameList = quick_xml::de::from_reader(br).unwrap();
 	}
 }
