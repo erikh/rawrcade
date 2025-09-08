@@ -29,3 +29,6 @@ tracing = "*"
 tracing-subscriber = "*"
 rand = "*"
 serde-xml-rs = "*"
+
+[dev-dependencies]
+xml = "*"

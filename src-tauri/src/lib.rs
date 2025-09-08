@@ -4,6 +4,8 @@ mod app;
 pub use self::app::*;
 mod command;
 pub use self::command::*;
+mod gamelist;
+pub use self::gamelist::*;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
