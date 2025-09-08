@@ -12,6 +12,10 @@ function App() {
 
   async function getOrientation() {
     setOrientation(await invoke("current_orientation"));
+    const element = document.getElementById("selected");
+    if (element) {
+      element.scrollIntoView();
+    }
   }
 
   useEffect(() => {
@@ -29,9 +33,7 @@ function App() {
     return () => clearInterval(id);
   }, []);
 
-  return (
-    <Theme systems={systems} orientation={orientation} />
-  );
+  return <Theme systems={systems} orientation={orientation} />;
 }
 
 export default App;

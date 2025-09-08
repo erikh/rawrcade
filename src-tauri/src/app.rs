@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+use crate::GameList;
+
 #[derive(Debug, Clone)]
 pub struct App {
 	pub all_systems: Arc<Mutex<Vec<System>>>,
@@ -11,34 +13,29 @@ pub struct App {
 
 impl Default for App {
 	fn default() -> Self {
+		let gamelist = GameList::from_file("test-gamelist.xml".into())
+			.unwrap()
+			.game
+			.iter()
+			.map(|x| Into::<Game>::into(x.clone()))
+			.collect::<Vec<Game>>();
+
 		Self {
 			all_systems: Arc::new(Mutex::new(vec![
 				System::default_template(
-					"Nintendo",
+					"Nintendo Entertainment System",
 					"nes",
-					vec![
-						"Super Mario Brothers",
-						"Deadly Towers",
-						"Karnov",
-					],
+					gamelist.clone(),
 				),
 				System::default_template(
-					"Super Nintendo",
+					"Super Nintendo Entertainment System",
 					"snes",
-					vec![
-						"Bubsy",
-						"Street Fighter 2",
-						"Legend of Zelda: A Link to the Past",
-					],
+					gamelist.clone(),
 				),
 				System::default_template(
 					"Sony Playstation",
 					"psx",
-					vec![
-						"Metal Gear Solid",
-						"Castlevania: Symphony of the Night",
-						"Banjo Kazooie",
-					],
+					gamelist.clone(),
 				),
 			])),
 			orientation: Arc::new(Mutex::new(Orientation::default())),
@@ -115,17 +112,19 @@ impl App {
 	}
 
 	pub async fn next_event(&self) -> Result<Event> {
-		tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+		tokio::time::sleep(std::time::Duration::from_millis(50)).await;
 
-		let input = match rand::random::<u8>() % 4 {
-			2 => InputEvent::Right,
-			1 => InputEvent::Left,
-			0 => InputEvent::Up,
-			_ => InputEvent::Down,
-		};
+		/*
+			let input = match rand::random::<u8>() % 2 {
+				2 => InputEvent::Right,
+				1 => InputEvent::Down,
+				0 => InputEvent::Up,
+				_ => InputEvent::Left,
+			};
+		*/
 
 		Ok(Event {
-			typ: EventType::Input(input),
+			typ: EventType::Input(InputEvent::Down),
 		})
 	}
 }
@@ -182,17 +181,12 @@ pub struct System {
 
 impl System {
 	pub fn default_template(
-		name: &str, tag: &str, gamelist: Vec<&str>,
+		name: &str, tag: &str, gamelist: Vec<Game>,
 	) -> Self {
 		Self {
 			name: name.to_string(),
 			tag: tag.to_string(),
-			gamelist: gamelist
-				.iter()
-				.map(|name| Game {
-					name: name.to_string(),
-				})
-				.collect(),
+			gamelist,
 			..Default::default()
 		}
 	}

@@ -3,12 +3,14 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use crate::Game;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameList {
 	#[serde(default, skip_serializing_if = "Vec::is_empty")]
-	game: Vec<ESGame>,
+	pub game: Vec<ESGame>,
 	#[serde(default, skip_serializing_if = "Vec::is_empty")]
-	folder: Vec<Folder>,
+	pub folder: Vec<Folder>,
 }
 
 impl GameList {
@@ -19,49 +21,65 @@ impl GameList {
 	}
 }
 
+impl Into<Game> for ESGame {
+	fn into(self) -> Game {
+		// NOTE: use the name, if not the name, use the basename of the path of the ROM, if not that,
+		// title it "Unnamed rom" and wash your hands of the matter.
+
+		Game {
+			name: self.name.unwrap_or(self.path.map_or(
+				"Unnamed ROM".into(),
+				|x| {
+					x.file_name().unwrap().to_str().unwrap().to_string()
+				},
+			)),
+		}
+	}
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Folder {
-	name: Option<String>,
+	pub name: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	desc: Option<String>,
+	pub desc: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	image: Option<PathBuf>,
+	pub image: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	thumbnail: Option<PathBuf>,
+	pub thumbnail: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ESGame {
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	path: Option<String>,
+	pub path: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	name: Option<String>,
+	pub name: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	desc: Option<String>,
+	pub desc: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	image: Option<PathBuf>,
+	pub image: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	thumbnail: Option<PathBuf>,
+	pub thumbnail: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	video: Option<PathBuf>,
+	pub video: Option<PathBuf>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	rating: Option<String>,
+	pub rating: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	releasedate: Option<String>,
+	pub releasedate: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	developer: Option<String>,
+	pub developer: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	publisher: Option<String>,
+	pub publisher: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	genre: Option<String>,
+	pub genre: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	players: Option<String>,
+	pub players: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	playcount: Option<usize>,
+	pub playcount: Option<usize>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	lastplayed: Option<String>,
+	pub lastplayed: Option<String>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	sortname: Option<String>,
+	pub sortname: Option<String>,
 }
 
 #[cfg(test)]

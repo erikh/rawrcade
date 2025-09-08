@@ -5,25 +5,23 @@ body {
 
 div.section {
   background-color: #888;
-  margin: 1em;
-  padding: 1.5em;
+  padding: 2vh;
   text-align: center;
   border-radius: 10px;
   border: 1px solid white;
 }
 
 div.system-info {
-  height: 20%;
+  height: 15vh;
 }
 
 div.system-banner {
-  height: 20%;
+  height: 15vh;
 }
 
 .system-title {
-  height: 100%;
   background-color: #666;
-  font-size: 2em;
+  font-size: 3vh;
   text-align: center;
   color: white;
   border-radius: 5px;
@@ -31,7 +29,7 @@ div.system-banner {
 }
 
 img.system-banner {
-  height: 200px;
+  height: 15vh;
   max-width: auto;
   border-radius: 5px;
 }
@@ -49,7 +47,7 @@ img.system-banner {
   color: black;
 }
 
-.selected {
+#selected {
   border: 1px solid #aaa;
   background-color: #384862;
   border-radius: 5px;
@@ -63,5 +61,10 @@ img.system-banner {
 
 .vertical-spacer {
   margin: 0;
-  padding: 1em;
+  padding: 2.75vh;
+}
+
+.game-list {
+  height: 70vh;
+  overflow-y: scroll;
 }
