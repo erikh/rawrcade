@@ -196,12 +196,30 @@ impl System {
 #[serde(rename_all = "snake_case")]
 pub struct Game {
 	pub name: String,
+	pub desc: Option<String>,
+	pub rating: Option<String>,
+	pub releasedate: Option<String>,
+	pub developer: Option<String>,
+	pub publisher: Option<String>,
+	pub genre: Option<String>,
+	pub players: Option<String>,
+	pub playcount: Option<usize>,
+	pub lastplayed: Option<String>,
 }
 
 impl Default for Game {
 	fn default() -> Self {
 		Self {
 			name: "Default Game".into(),
+			desc: None,
+			rating: None,
+			releasedate: None,
+			developer: None,
+			publisher: None,
+			genre: None,
+			players: None,
+			playcount: None,
+			lastplayed: None,
 		}
 	}
 }

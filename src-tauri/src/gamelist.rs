@@ -33,6 +33,15 @@ impl Into<Game> for ESGame {
 					x.file_name().unwrap().to_str().unwrap().to_string()
 				},
 			)),
+			desc: self.desc,
+			rating: self.rating,
+			releasedate: self.releasedate,
+			developer: self.developer,
+			publisher: self.publisher,
+			genre: self.genre,
+			players: self.players,
+			playcount: self.playcount,
+			lastplayed: self.lastplayed,
 		}
 	}
 }
