@@ -29,6 +29,7 @@ tracing = "*"
 tracing-subscriber = "*"
 rand = "*"
 quick-xml = { version = "*", features = [ "serialize" ] }
+thiserror = "*"
 
 [dev-dependencies]
 xml = "*"
