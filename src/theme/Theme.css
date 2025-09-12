@@ -39,21 +39,22 @@ img.system-banner {
   text-align: start;
   padding-left: 2em;
   padding-right: 2em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
   color: white;
   margin-left: auto;
   margin-right: auto;
 }
 
 .not-selected {
+  background-color: #ccc;
   color: black;
 }
 
 #selected {
-  border: 1px solid #aaa;
+  border-top: 3px solid #444;
+  border-bottom: 3px solid #444;
   background-color: #384862;
-  border-radius: 5px;
-  box-shadow: 5px 5px 15px #444;
-  height: 10vh;
 }
 
 .arrow {
@@ -67,8 +68,13 @@ img.system-banner {
 }
 
 .game-list {
-  height: 70vh;
+  background-color: #888;
+  margin-left: 1em;
+  margin-right: 1em;
+  height: 60vh;
   overflow-y: scroll;
+  border-radius: 0.5em;
+  border: 1px solid #aaa;
 }
 
 .game-image {
