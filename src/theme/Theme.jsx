@@ -4,6 +4,13 @@ import Container from "@mui/system/Container";
 import Stack from "@mui/system/Stack";
 import Grid from "@mui/system/Grid";
 import "./Theme.css";
+import { invoke, convertFileSrc } from "@tauri-apps/api/core";
+
+let CURRENT_GAMELIST_ASSETS = null;
+
+async function getAsset(t) {
+  return await invoke("current_asset", { assetType: t });
+}
 
 const NO_GAME_LIST = () => {
   <div>No Game List Provided</div>;
@@ -13,6 +20,27 @@ function GameList(props) {
   const list = props.list;
   const current = props.current;
 
+  if (!CURRENT_GAMELIST_ASSETS || current != CURRENT_GAMELIST_ASSETS.index) {
+    let image = <div> </div>;
+    let res = getAsset("image").then((filename) => {
+      console.log(filename);
+      if (filename) {
+        return <img class="game-image" src={convertFileSrc(filename)} />;
+      } else {
+        return <div> </div>;
+      }
+    });
+
+    if (res) {
+      image = res;
+    }
+
+    CURRENT_GAMELIST_ASSETS = {
+      index: current,
+      image: image,
+    };
+  }
+
   if (list.length == 0) {
     return <NO_GAME_LIST />;
   }
@@ -21,10 +49,19 @@ function GameList(props) {
     <React.Fragment>
       {list.map((x, i) => {
         return current == i ? (
-          <div id="selected" class="game">
-            <span class="arrow">►</span>
-            {"  "}
-            {x.name}
+          <div key={i} id="selected" class="game">
+            <Grid container spacing={2}>
+              <Grid size={4}>
+                <span class="arrow">►</span>
+                {"  "}
+                {x.name}
+              </Grid>
+              <Grid size={8}>
+                <Grid container spacing={2}>
+                  <Grid size={4}>{CURRENT_GAMELIST_ASSETS.image}</Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </div>
         ) : (
           <div class="game not-selected">{x.name}</div>

@@ -5,7 +5,8 @@ body {
 
 div.section {
   background-color: #888;
-  padding: 2vh;
+  padding-top: 2em;
+  padding-bottom: 2em;
   text-align: center;
   border-radius: 10px;
   border: 1px solid white;
@@ -52,6 +53,7 @@ img.system-banner {
   background-color: #384862;
   border-radius: 5px;
   box-shadow: 5px 5px 15px #444;
+  height: 10vh;
 }
 
 .arrow {
@@ -67,4 +69,10 @@ img.system-banner {
 .game-list {
   height: 70vh;
   overflow-y: scroll;
+}
+
+.game-image {
+  margin: 1vh;
+  height: 8vh;
+  width: auto;
 }

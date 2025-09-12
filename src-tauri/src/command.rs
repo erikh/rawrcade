@@ -1,18 +1,18 @@
-use std::path::PathBuf;
-
-use thiserror::Error;
-use tokio::io::AsyncReadExt;
-
 use super::{App, Orientation, System};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use tauri::State;
+use thiserror::Error;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetType {
 	#[default]
+	#[serde(rename = "image")]
 	Image,
+	#[serde(rename = "thumbnail")]
 	Thumbnail,
+	#[serde(rename = "video")]
 	Video,
 }
 
@@ -27,7 +27,7 @@ pub enum AssetError {
 #[tauri::command]
 pub async fn current_asset(
 	state: State<'_, App>, asset_type: AssetType,
-) -> std::result::Result<Option<Vec<u8>>, ()> {
+) -> std::result::Result<Option<PathBuf>, ()> {
 	let systems = state.all_systems.lock().await.clone();
 	let orientation = state.orientation.lock().await;
 	let current_system = &systems[orientation.system_index];
@@ -38,26 +38,7 @@ pub async fn current_asset(
 		AssetType::Thumbnail => current_game.thumbnail.clone(),
 		AssetType::Video => current_game.video.clone(),
 	};
-
-	if let Some(filename) = filename {
-		let res = tokio::fs::OpenOptions::new()
-			.read(true)
-			.open(filename)
-			.await;
-		match res {
-			Ok(mut f) => {
-				let mut v = Vec::new();
-				let res = f.read_to_end(&mut v).await;
-				match res {
-					Ok(_) => Ok(Some(v)),
-					_ => Ok(None),
-				}
-			}
-			_ => Ok(None),
-		}
-	} else {
-		Ok(None)
-	}
+	Ok(filename)
 }
 
 #[tauri::command]

@@ -112,7 +112,7 @@ impl App {
 	}
 
 	pub async fn next_event(&self) -> Result<Event> {
-		tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+		tokio::time::sleep(std::time::Duration::from_secs(60)).await;
 
 		/*
 			let input = match rand::random::<u8>() % 2 {
