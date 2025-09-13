@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect } from "react";
 import Box from "@mui/system/Box";
 import Container from "@mui/system/Container";
 import Stack from "@mui/system/Stack";
@@ -60,6 +60,10 @@ function GameList(props) {
   const list = props.list;
   const current = props.current;
 
+  useEffect(() => {
+    populateGameListAssets(current || 0);
+  }, [current]);
+
   if (!list || list.length == 0) {
     return <NoGameList />;
   }
@@ -90,10 +94,6 @@ function Theme(props) {
     orientation && systems && systems.length > 0
       ? systems[orientation.system_index]
       : {};
-
-  useEffect(() => {
-    populateGameListAssets(current_system.gamelist_index || 0);
-  }, [current_system]);
 
   return (
     <Container maxWidth="100%">
