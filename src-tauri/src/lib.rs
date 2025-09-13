@@ -1,3 +1,6 @@
+use std::sync::atomic::AtomicPtr;
+use std::time::Duration;
+
 use tauri::Manager;
 
 mod app;
@@ -7,12 +10,15 @@ pub use self::command::*;
 mod gamelist;
 pub use self::gamelist::*;
 use gilrs::{Button, Event as GamepadEvent, Gilrs};
+use std::time::Instant;
 use tokio::sync::mpsc::Sender;
 
 async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut gilrs = Gilrs::new().unwrap();
+	let mut debounce: Option<Instant> = None;
+	let mut latest_axis: Option<(gilrs::Axis, f32)> = None;
 
-	loop {
+	'event_loop: loop {
 		while let Some(GamepadEvent {
 			id: _,
 			event,
@@ -20,9 +26,62 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 			..
 		}) = gilrs.next_event()
 		{
+			tracing::debug!("{:?}", event);
 			match event {
+				gilrs::EventType::AxisChanged(x, amp, ..) => {
+					if let Some(inner) = debounce {
+						if Instant::now() - inner
+							< Duration::from_millis(200)
+						{
+							continue 'event_loop;
+						} else {
+							debounce = None;
+						}
+					}
+
+					if let Some(inner) = latest_axis {
+						if inner.0 == x {
+							// NOTE: pulling back on the stick should not generate additional events. this
+							// fixes that.
+							if (inner.1 < 0.0 && amp > inner.1)
+								|| (inner.1 > 0.0 && amp < inner.1)
+							{
+								continue 'event_loop;
+							}
+						} else {
+							latest_axis = None;
+						}
+					}
+
+					let event = match x {
+						gilrs::Axis::LeftStickY => {
+							if amp > 0.5 {
+								Some(InputEvent::Up)
+							} else if amp < -0.5 {
+								Some(InputEvent::Down)
+							} else {
+								None
+							}
+						}
+						gilrs::Axis::LeftStickX => {
+							if amp > 0.5 {
+								Some(InputEvent::Right)
+							} else if amp < -0.5 {
+								Some(InputEvent::Left)
+							} else {
+								None
+							}
+						}
+						_ => None,
+					};
+
+					if let Some(event) = event {
+						latest_axis = Some((x, amp));
+						debounce = Some(Instant::now());
+						let _ = sender.send(event).await;
+					}
+				}
 				gilrs::EventType::ButtonPressed(x, ..) => {
-					eprintln!("{:?} pressed", x);
 					let event = match x {
 						Button::DPadDown => InputEvent::Down,
 						Button::DPadUp => InputEvent::Up,
