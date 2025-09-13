@@ -1,7 +1,10 @@
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use std::{sync::Arc, time::Duration};
+use tokio::sync::{
+	Mutex,
+	mpsc::{Receiver, Sender, channel},
+};
 
 use crate::{Game, GameList};
 
@@ -9,6 +12,9 @@ use crate::{Game, GameList};
 pub struct App {
 	pub all_systems: Arc<Mutex<Vec<System>>>,
 	pub orientation: Arc<Mutex<Orientation>>,
+	pub input_send: Sender<InputEvent>,
+
+	input_recv: Arc<Mutex<Receiver<InputEvent>>>,
 }
 
 impl Default for App {
@@ -20,7 +26,11 @@ impl Default for App {
 			.map(|x| Into::<Game>::into(x.clone()))
 			.collect::<Vec<Game>>();
 
+		let (s, r) = channel(1000);
+
 		Self {
+			input_send: s,
+			input_recv: Arc::new(Mutex::new(r)),
 			all_systems: Arc::new(Mutex::new(vec![
 				System::default_template(
 					"Nintendo Entertainment System",
@@ -48,7 +58,7 @@ impl App {
 		while let Ok(event) = self.next_event().await {
 			match event.typ {
 				EventType::Input(e) => {
-					tracing::trace!("input event: {:?}", e);
+					tracing::debug!("input event: {:?}", e);
 					match e {
 						InputEvent::Right => {
 							let len =
@@ -112,20 +122,20 @@ impl App {
 	}
 
 	pub async fn next_event(&self) -> Result<Event> {
-		tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+		loop {
+			let mut chan = self.input_recv.lock().await;
+			let item = chan.try_recv();
+			if let Ok(item) = item {
+				tracing::debug!("received event {:?}", item);
 
-		/*
-			let input = match rand::random::<u8>() % 2 {
-				2 => InputEvent::Right,
-				1 => InputEvent::Down,
-				0 => InputEvent::Up,
-				_ => InputEvent::Left,
-			};
-		*/
-
-		Ok(Event {
-			typ: EventType::Input(InputEvent::Down),
-		})
+				return Ok(Event {
+					typ: EventType::Input(item),
+				});
+			} else {
+				tokio::time::sleep(Duration::from_millis(50)).await;
+				continue;
+			}
+		}
 	}
 }
 
