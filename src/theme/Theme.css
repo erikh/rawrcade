@@ -3,20 +3,19 @@ body {
   background-color: black;
 }
 
-div.section {
+.section {
   background-color: #888;
-  padding-top: 2em;
-  padding-bottom: 2em;
+  padding: 2em;
   text-align: center;
   border-radius: 10px;
   border: 1px solid white;
 }
 
-div.system-info {
+.system-info {
   height: 15vh;
 }
 
-div.system-banner {
+.system-banner {
   height: 15vh;
 }
 
@@ -29,9 +28,8 @@ div.system-banner {
   border: 1px solid #222;
 }
 
-img.system-banner {
+.system-banner {
   height: 15vh;
-  max-width: auto;
   border-radius: 5px;
 }
 
@@ -42,8 +40,6 @@ img.system-banner {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   color: white;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .not-selected {
@@ -68,9 +64,6 @@ img.system-banner {
 }
 
 .game-list {
-  background-color: #888;
-  margin-left: 1em;
-  margin-right: 1em;
   height: 60vh;
   overflow-y: scroll;
   border-radius: 0.5em;
@@ -79,6 +72,6 @@ img.system-banner {
 
 .game-image {
   margin: 1vh;
-  height: 8vh;
+  height: 30vh;
   width: auto;
 }

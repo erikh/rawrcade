@@ -1,8 +1,8 @@
-import React from "react";
+import { React, useEffect, useState } from "react";
 import Box from "@mui/system/Box";
 import Container from "@mui/system/Container";
 import Stack from "@mui/system/Stack";
-import { Grid, Item } from "@mui/system/Grid";
+import Grid from "@mui/system/Grid";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
@@ -12,41 +12,60 @@ async function getAsset(t) {
   return await invoke("current_asset", { assetType: t });
 }
 
-const NoGameList = () => {
-  <div>No Game List Provided</div>;
-};
+async function getText(t) {
+  let res = await invoke("current_text", { textType: t });
+
+  if (res && res.length >= 100) {
+    res = res.substr(0, 97) + "...";
+  }
+
+  return res;
+}
+
+function NoGameList() {
+  return <div>No Game List Provided</div>;
+}
+
+function populateGameListAssets(current) {
+  let res = getAsset("image").then((filename) => {
+    if (filename) {
+      return (
+        <div>
+          <img class="game-image" src={convertFileSrc(filename)} />
+        </div>
+      );
+    } else {
+      return null;
+    }
+  });
+
+  let image = <div> </div>;
+
+  if (res) {
+    image = res;
+  }
+
+  let description = getText("description").then((desc) =>
+    desc ? <div>{desc}</div> : <div> </div>
+  );
+
+  CURRENT_GAMELIST_ASSETS = {
+    index: current,
+    image: image,
+    description: description,
+  };
+}
 
 function GameList(props) {
   const list = props.list;
   const current = props.current;
 
-  if (!CURRENT_GAMELIST_ASSETS || current != CURRENT_GAMELIST_ASSETS.index) {
-    let res = getAsset("image").then((filename) => {
-      if (filename) {
-        return <img class="game-image" src={convertFileSrc(filename)} />;
-      } else {
-        return null;
-      }
-    });
-
-    let image = <div> </div>;
-
-    if (res) {
-      image = res;
-    }
-
-    CURRENT_GAMELIST_ASSETS = {
-      index: current,
-      image: image,
-    };
-  }
-
-  if (list.length == 0) {
+  if (!list || list.length == 0) {
     return <NoGameList />;
   }
 
   return (
-    <React.Fragment>
+    <div>
       {list.map((x, i) => {
         return current == i ? (
           <div key={i} id="selected" class="game">
@@ -55,10 +74,12 @@ function GameList(props) {
             {x.name}
           </div>
         ) : (
-          <div class="game not-selected">{x.name}</div>
+          <div key={i} class="game not-selected">
+            {x.name}
+          </div>
         );
       })}
-    </React.Fragment>
+    </div>
   );
 }
 
@@ -66,15 +87,21 @@ function Theme(props) {
   const orientation = props.orientation;
   const systems = props.systems;
   const current_system =
-    systems.length > 0 && systems[orientation.system_index];
+    orientation && systems && systems.length > 0
+      ? systems[orientation.system_index]
+      : {};
+
+  useEffect(() => {
+    populateGameListAssets(current_system.gamelist_index || 0);
+  }, [current_system]);
 
   return (
     <Container maxWidth="100%">
       <Stack spacing={2}>
-        <Item className="section system-info">
+        <div className="section system-info">
           <Grid container spacing={2}>
             <Grid size={4}>
-              <Item>
+              <div>
                 <Box className="system-banner">
                   {current_system ? (
                     <img
@@ -85,44 +112,47 @@ function Theme(props) {
                     <React.Fragment />
                   )}
                 </Box>
-              </Item>
+              </div>
             </Grid>
             <Grid size={8}>
-              <Item className="system-title">
+              <div className="system-title">
                 <div className="vertical-spacer" />
                 {orientation && systems.length > 0
                   ? systems[orientation.system_index].name
                   : "No Systems Loaded"}
                 <div className="vertical-spacer" />
-              </Item>
+              </div>
             </Grid>
           </Grid>
-        </Item>
-        <Item className="section">
+        </div>
+        <div className="section">
           <Grid container spacing={2}>
             <Grid size={6} className="game-list">
-              <Item>
+              <div>
                 {current_system ? (
                   <GameList
                     list={current_system.gamelist}
-                    current={orientation.gamelist_index}
+                    current={orientation ? orientation.gamelist_index : 0}
                   />
                 ) : (
                   <NoGameList />
                 )}
-              </Item>
+              </div>
             </Grid>
             <Grid size={6} className="current-game">
-              <Item>
-                {CURRENT_GAMELIST_ASSETS ? (
-                  CURRENT_GAMELIST_ASSETS.image
-                ) : (
-                  <React.Fragment />
-                )}
-              </Item>
+              {CURRENT_GAMELIST_ASSETS ? (
+                CURRENT_GAMELIST_ASSETS.image
+              ) : (
+                <div />
+              )}
+              {CURRENT_GAMELIST_ASSETS ? (
+                CURRENT_GAMELIST_ASSETS.description
+              ) : (
+                <div />
+              )}
             </Grid>
           </Grid>
-        </Item>
+        </div>
       </Stack>
     </Container>
   );

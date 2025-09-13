@@ -30,6 +30,7 @@ pub fn run() {
 			all_systems,
 			current_orientation,
 			current_asset,
+			current_text,
 		])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");

@@ -20,12 +20,7 @@ function App() {
 
   useEffect(() => {
     getSystems();
-
-    // FIXME: play with this interval value, could be happening way too often
-    //        for big game lists
-    const id = setInterval(() => getSystems(), 1000);
-    return () => clearInterval(id);
-  }, []);
+  }, [orientation ? orientation.system_index : 0]);
 
   useEffect(() => {
     getOrientation();

@@ -2,26 +2,14 @@ use super::{App, Orientation, System};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::State;
-use thiserror::Error;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetType {
 	#[default]
-	#[serde(rename = "image")]
 	Image,
-	#[serde(rename = "thumbnail")]
 	Thumbnail,
-	#[serde(rename = "video")]
 	Video,
-}
-
-#[derive(Debug, Error)]
-pub enum AssetError {
-	#[error("this asset does not have an associated path")]
-	NotExist,
-	#[error("i/o error")]
-	IO(#[from] std::io::Error),
 }
 
 #[tauri::command]
@@ -39,6 +27,45 @@ pub async fn current_asset(
 		AssetType::Video => current_game.video.clone(),
 	};
 	Ok(filename)
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TextType {
+	#[default]
+	Description,
+	Rating,
+	ReleaseDate,
+	Developer,
+	Publisher,
+	Genre,
+	Players,
+	PlayCount,
+	LastPlayed,
+}
+
+#[tauri::command]
+pub async fn current_text(
+	state: State<'_, App>, text_type: TextType,
+) -> std::result::Result<Option<String>, ()> {
+	let systems = state.all_systems.lock().await.clone();
+	let orientation = state.orientation.lock().await;
+	let current_system = &systems[orientation.system_index];
+	let current_game =
+		current_system.gamelist[orientation.gamelist_index].clone();
+	Ok(match text_type {
+		TextType::Description => current_game.desc,
+		TextType::Rating => current_game.rating,
+		TextType::ReleaseDate => current_game.releasedate,
+		TextType::Developer => current_game.developer,
+		TextType::Publisher => current_game.publisher,
+		TextType::Genre => current_game.genre,
+		TextType::Players => current_game.players,
+		TextType::PlayCount => {
+			current_game.playcount.map(|x| x.to_string())
+		}
+		TextType::LastPlayed => current_game.lastplayed,
+	})
 }
 
 #[tauri::command]
