@@ -25,6 +25,9 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 					eprintln!("{:?} pressed", x);
 					let event = match x {
 						Button::DPadDown => InputEvent::Down,
+						Button::DPadUp => InputEvent::Up,
+						Button::DPadLeft => InputEvent::Left,
+						Button::DPadRight => InputEvent::Right,
 						_ => InputEvent::Down,
 					};
 
