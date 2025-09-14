@@ -113,7 +113,7 @@ function Theme(props) {
                     {current_system ? (
                       <img
                         class="system-banner"
-                        src={`theme/${current_system.tag}.png`}
+                        src={`theme/${current_system.platform}.png`}
                       />
                     ) : (
                       <React.Fragment />
@@ -123,11 +123,9 @@ function Theme(props) {
               </Grid>
               <Grid size={8}>
                 <div className="system-title">
-                  <div className="vertical-spacer" />
                   {orientation && systems.length > 0
-                    ? systems[orientation.system_index].name
+                    ? systems[orientation.system_index].fullname
                     : "No Systems Loaded"}
-                  <div className="vertical-spacer" />
                 </div>
               </Grid>
             </Grid>

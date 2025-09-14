@@ -21,7 +21,7 @@ pub enum AssetType {
 pub async fn current_asset(
 	state: State<'_, App>, asset_type: AssetType,
 ) -> std::result::Result<Option<PathBuf>, ()> {
-	let systems = state.all_systems.lock().await.clone();
+	let systems = state.all_systems.lock().await.system.clone();
 	let orientation = state.orientation.lock().await;
 	let current_system = &systems[orientation.system_index];
 	let current_game =
@@ -53,7 +53,7 @@ pub enum TextType {
 pub async fn current_text(
 	state: State<'_, App>, text_type: TextType,
 ) -> std::result::Result<Option<String>, ()> {
-	let systems = state.all_systems.lock().await.clone();
+	let systems = state.all_systems.lock().await.system.clone();
 	let orientation = state.orientation.lock().await;
 	let current_system = &systems[orientation.system_index];
 	let current_game =
@@ -77,7 +77,7 @@ pub async fn current_text(
 pub async fn all_systems(
 	state: State<'_, App>,
 ) -> std::result::Result<Vec<System>, ()> {
-	Ok(state.all_systems.clone().lock_owned().await.clone())
+	Ok(state.all_systems.clone().lock_owned().await.system.clone())
 }
 
 #[tauri::command]

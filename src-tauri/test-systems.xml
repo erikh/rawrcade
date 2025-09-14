@@ -1,0 +1,125 @@
+<!-- This is the EmulationStation Systems configuration file.
+All systems must be contained within the <systemList> tag.-->
+
+<systemList>
+	<system>
+		<name>NES</name>
+		<fullname>Nintendo Entertainment System</fullname>
+		<path>~/roms/nes</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.nes .NES .zip</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>WAYLAND_DISPLAY="" retroarch -L nestopia %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>nes</platform>
+	</system>
+	<system>
+		<name>SNES</name>
+		<fullname>Super Nintendo Entertainment System</fullname>
+		<path>~/roms/snes</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.zip .smc .sfc</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>WAYLAND_DISPLAY="" retroarch -L snes9x %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>snes</platform>
+	</system>
+	<system>
+		<name>MAME</name>
+		<fullname>MAME</fullname>
+		<path>~/roms/mame</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.zip</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>WAYLAND_DISPLAY="" retroarch -L mame %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>mame</platform>
+	</system>
+	<system>
+		<name>N64</name>
+		<fullname>Nintendo 64</fullname>
+		<path>~/roms/n64</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.zip .z64 .n64</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>WAYLAND_DISPLAY="" retroarch -L dolphin %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>n64</platform>
+	</system>
+	<system>
+		<name>PSX</name>
+		<fullname>Playstation</fullname>
+		<path>~/roms/psx</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.bin .cue .iso</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>WAYLAND_DISPLAY="" retroarch -L mednafen_psx_hw %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>psx</platform>
+	</system>
+	<system>
+		<name>PS2</name>
+		<fullname>Playstation 2</fullname>
+		<path>~/roms/ps2</path>
+
+		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
+		You MUST include the period at the start of the extension! It's also case sensitive. -->
+		<extension>.iso .bin .cue</extension>
+
+		<!-- The shell command executed when a game is selected. A few special tags are replaced if found in a command:
+		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
+		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
+		%ROM_RAW% is the raw, unescaped path to the ROM. -->
+		<command>pcsx2 %ROM%</command>
+
+		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
+		It's case sensitive, but everything is lowercase. This tag is optional.
+		You can use multiple platforms too, delimited with any of the whitespace characters (", \r\n\t"), eg: "genesis, megadrive" -->
+		<platform>ps2</platform>
+	</system>
+</systemList>

@@ -6,10 +6,12 @@ use tokio::sync::mpsc::Sender;
 mod app;
 mod command;
 mod gamelist;
+mod systems;
 
 pub use self::app::*;
 pub use self::command::*;
 pub use self::gamelist::*;
+pub use self::systems::*;
 
 async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut gilrs = Gilrs::new().unwrap();

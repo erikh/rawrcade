@@ -16,21 +16,25 @@ body {
 }
 
 .system-banner {
-  height: 15vh;
+  padding-top: 1.5vh;
+  height: 10vh;
+  max-width: 100%;
+  padding-bottom: 2vh;
 }
 
 .system-title {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+  padding: 3vh;
+  height: 10vh;
   background-color: #666;
   font-size: 3vh;
-  text-align: center;
+  justify-content: center;
   color: white;
   border-radius: 5px;
   border: 1px solid #222;
-}
-
-.system-banner {
-  height: 15vh;
-  border-radius: 5px;
 }
 
 .game {

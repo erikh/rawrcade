@@ -1,4 +1,4 @@
-use crate::{Game, GameList};
+use crate::{Game, GameList, SystemList};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{sync::Arc, time::Duration};
@@ -9,7 +9,7 @@ use tokio::sync::{
 
 #[derive(Debug, Clone)]
 pub struct App {
-	pub all_systems: Arc<Mutex<Vec<System>>>,
+	pub all_systems: Arc<Mutex<SystemList>>,
 	pub orientation: Arc<Mutex<Orientation>>,
 	pub input_send: Sender<InputEvent>,
 
@@ -18,6 +18,9 @@ pub struct App {
 
 impl Default for App {
 	fn default() -> Self {
+		let mut all_systems =
+			SystemList::from_file("test-systems.xml".into()).unwrap();
+
 		let gamelist = GameList::from_file("test-gamelist.xml".into())
 			.unwrap()
 			.game
@@ -25,28 +28,16 @@ impl Default for App {
 			.map(|x| Into::<Game>::into(x.clone()))
 			.collect::<Vec<Game>>();
 
+		for x in &mut all_systems.system {
+			x.gamelist = gamelist.clone()
+		}
+
 		let (s, r) = channel(1000);
 
 		Self {
 			input_send: s,
 			input_recv: Arc::new(Mutex::new(r)),
-			all_systems: Arc::new(Mutex::new(vec![
-				System::default_template(
-					"Nintendo Entertainment System",
-					"nes",
-					gamelist.clone(),
-				),
-				System::default_template(
-					"Super Nintendo Entertainment System",
-					"snes",
-					gamelist.clone(),
-				),
-				System::default_template(
-					"Sony Playstation",
-					"psx",
-					gamelist.clone(),
-				),
-			])),
+			all_systems: Arc::new(Mutex::new(all_systems)),
 			orientation: Arc::new(Mutex::new(Orientation::default())),
 		}
 	}
@@ -85,9 +76,12 @@ impl App {
 							let mut lock =
 								self.orientation.lock().await;
 							if !lock.menu_active {
-								let len =
-									self.all_systems.lock().await.len()
-										- 1;
+								let len = self
+									.all_systems
+									.lock()
+									.await
+									.system
+									.len() - 1;
 								if lock.system_index >= len {
 									lock.system_index = 0;
 								} else {
@@ -101,9 +95,12 @@ impl App {
 							let mut lock =
 								self.orientation.lock().await;
 							if !lock.menu_active {
-								let len =
-									self.all_systems.lock().await.len()
-										- 1;
+								let len = self
+									.all_systems
+									.lock()
+									.await
+									.system
+									.len() - 1;
 								if lock.system_index == 0 {
 									lock.system_index = len;
 								} else {
@@ -129,8 +126,11 @@ impl App {
 									lock.menu_index = Some(0)
 								}
 							} else {
-								let len = self.all_systems.lock().await
-									[lock.system_index]
+								let len = self
+									.all_systems
+									.lock()
+									.await
+									.system[lock.system_index]
 									.gamelist
 									.len() - 1;
 
@@ -158,8 +158,11 @@ impl App {
 									lock.menu_index = Some(0)
 								}
 							} else {
-								let len = self.all_systems.lock().await
-									[lock.system_index]
+								let len = self
+									.all_systems
+									.lock()
+									.await
+									.system[lock.system_index]
 									.gamelist
 									.len() - 1;
 
@@ -233,39 +236,4 @@ pub struct Orientation {
 	pub menu_active: bool,
 	pub menu_index: Option<usize>,
 	pub menu_item_index: Option<usize>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub struct System {
-	pub name: String,
-	pub tag: String,
-	pub description: Option<String>,
-	pub photo: Option<String>,
-	pub gamelist: Vec<Game>,
-}
-
-impl System {
-	pub fn default_template(
-		name: &str, tag: &str, gamelist: Vec<Game>,
-	) -> Self {
-		Self {
-			name: name.to_string(),
-			tag: tag.to_string(),
-			gamelist,
-			..Default::default()
-		}
-	}
-}
-
-impl Default for System {
-	fn default() -> Self {
-		Self {
-			name: "Default System".into(),
-			tag: "default".into(),
-			description: None,
-			photo: None,
-			gamelist: vec![Game::default()],
-		}
-	}
 }
