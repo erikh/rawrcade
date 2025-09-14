@@ -101,15 +101,34 @@ body {
 /* I hate CSS */
 .menu-not-selected-first-item {
   background-color: #999;
-  border: 1px solid black;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+.menu-not-selected-previous-first-item {
+  background-color: #999;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: none;
 }
 
 .menu-not-selected-previous-item {
   background-color: #999;
+  border-bottom: none;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-top: none;
+}
+
+.menu-not-selected-next-item {
+  background-color: #999;
   border-top: none;
   border-left: 1px solid black;
   border-right: 1px solid black;
-  border-bottom: none;
+  border-bottom: 1px solid black;
 }
 
 .menu-not-selected {
