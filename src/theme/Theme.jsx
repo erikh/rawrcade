@@ -7,6 +7,7 @@ import Popover from "@mui/material/Popover";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
+let CURRENT_MENU = [];
 let CURRENT_GAMELIST_ASSETS = null;
 
 async function getAsset(t) {
@@ -96,6 +97,10 @@ function Theme(props) {
       ? systems[orientation.system_index]
       : {};
 
+  React.useEffect(() => {
+    invoke("menu").then((x) => (CURRENT_MENU = x));
+  }, [orientation && orientation.menu_active]);
+
   return (
     <React.Fragment>
       <Container maxWidth="100%">
@@ -159,9 +164,17 @@ function Theme(props) {
       </Container>
       <Popover
         className="menu-popover"
-        open={orientation && orientation.menu_active}
+        open={CURRENT_MENU.length > 0 && orientation && orientation.menu_active}
       >
-        <div className="menu-root">test</div>
+        <div className="menu-root">
+          {CURRENT_MENU.map((item, i) =>
+            orientation && orientation.menu_index == i ? (
+              <div className="menu-selected">{item}</div>
+            ) : (
+              <div className="menu-not-selected">{item}</div>
+            )
+          )}
+        </div>
       </Popover>
     </React.Fragment>
   );

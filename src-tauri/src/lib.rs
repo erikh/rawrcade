@@ -123,6 +123,7 @@ pub fn run() {
 			current_orientation,
 			current_asset,
 			current_text,
+			menu,
 		])
 		.run(tauri::generate_context!())
 		.expect("error while running tauri application");

@@ -3,6 +3,11 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::State;
 
+#[tauri::command]
+pub fn menu(state: State<'_, App>) -> Vec<String> {
+	state.menu()
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetType {

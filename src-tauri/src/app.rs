@@ -53,6 +53,16 @@ impl Default for App {
 }
 
 impl App {
+	pub fn menu(&self) -> Vec<String> {
+		vec![
+			"One".into(),
+			"Two".into(),
+			"Three".into(),
+			"Four".into(),
+			"Five".into(),
+		]
+	}
+
 	pub async fn event_loop(&self) {
 		while let Ok(event) = self.next_event().await {
 			match event.typ {
