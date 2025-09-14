@@ -89,6 +89,7 @@ body {
   color: white;
   border: none;
   border-top: none;
+  border-bottom: none;
 }
 
 .menu-selected {
@@ -101,6 +102,14 @@ body {
 .menu-not-selected-first-item {
   background-color: #999;
   border: 1px solid black;
+}
+
+.menu-not-selected-previous-item {
+  background-color: #999;
+  border-top: none;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: none;
 }
 
 .menu-not-selected {

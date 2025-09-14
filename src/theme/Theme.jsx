@@ -170,8 +170,12 @@ function Theme(props) {
           {CURRENT_MENU.map((item, i) =>
             orientation && orientation.menu_index == i ? (
               <div className="menu-item menu-selected">{item}</div>
-            ) : orientation.menu_index == 0 ? (
+            ) : i == 0 ? (
               <div className="menu-item menu-not-selected-first-item">
+                {item}
+              </div>
+            ) : i == orientation.menu_index - 1 ? (
+              <div className="menu-item menu-not-selected-previous-item">
                 {item}
               </div>
             ) : (

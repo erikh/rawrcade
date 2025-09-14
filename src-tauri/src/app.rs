@@ -76,6 +76,9 @@ impl App {
 								!orientation.menu_active;
 							if orientation.menu_active {
 								orientation.menu_index = Some(0);
+							} else {
+								orientation.menu_index = None;
+								orientation.menu_item_index = None;
 							}
 						}
 						InputEvent::Right => {
@@ -107,29 +110,58 @@ impl App {
 						InputEvent::Up => {
 							let mut lock =
 								self.orientation.lock().await;
-							let len = self.all_systems.lock().await
-								[lock.system_index]
-								.gamelist
-								.len() - 1;
-
-							if lock.gamelist_index == 0 {
-								lock.gamelist_index = len;
+							if lock.menu_active {
+								let len = self.menu().len() - 1;
+								if let Some(index) = lock.menu_index {
+									if index == 0 {
+										lock.menu_index = Some(len);
+									} else {
+										lock.menu_index =
+											Some(index - 1);
+									}
+								} else {
+									lock.menu_index = Some(0)
+								}
 							} else {
-								lock.gamelist_index -= 1;
+								let len = self.all_systems.lock().await
+									[lock.system_index]
+									.gamelist
+									.len() - 1;
+
+								if lock.gamelist_index == 0 {
+									lock.gamelist_index = len;
+								} else {
+									lock.gamelist_index -= 1;
+								}
 							}
 						}
 						InputEvent::Down => {
 							let mut lock =
 								self.orientation.lock().await;
-							let len = self.all_systems.lock().await
-								[lock.system_index]
-								.gamelist
-								.len() - 1;
+							if lock.menu_active {
+								let len = self.menu().len() - 1;
 
-							if lock.gamelist_index == len {
-								lock.gamelist_index = 0;
+								if let Some(index) = lock.menu_index {
+									if index == len {
+										lock.menu_index = Some(0);
+									} else {
+										lock.menu_index =
+											Some(index + 1);
+									}
+								} else {
+									lock.menu_index = Some(0)
+								}
 							} else {
-								lock.gamelist_index += 1;
+								let len = self.all_systems.lock().await
+									[lock.system_index]
+									.gamelist
+									.len() - 1;
+
+								if lock.gamelist_index == len {
+									lock.gamelist_index = 0;
+								} else {
+									lock.gamelist_index += 1;
+								}
 							}
 						}
 						_ => {}
