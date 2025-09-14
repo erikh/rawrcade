@@ -37,7 +37,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 
 					if let Some(inner) = latest_axis {
 						if inner.0 == x {
-							// NOTE: pulling back on the stick should not generate additional events. this
+							// NOTE: releasing the stick should not generate additional events. this
 							// fixes that.
 							if (inner.1 < 0.0 && amp > inner.1)
 								|| (inner.1 > 0.0 && amp < inner.1)

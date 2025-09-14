@@ -31,7 +31,7 @@ body {
   height: 10vh;
   background-color: #666;
   font-size: 3vh;
-  justify-content: center;
+  text-align: center;
   color: white;
   border-radius: 5px;
   border: 1px solid #222;
