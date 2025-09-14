@@ -82,30 +82,36 @@ impl App {
 							}
 						}
 						InputEvent::Right => {
-							let len =
-								self.all_systems.lock().await.len() - 1;
 							let mut lock =
 								self.orientation.lock().await;
-							if lock.system_index >= len {
-								lock.system_index = 0;
-							} else {
-								lock.system_index += 1;
-							}
+							if !lock.menu_active {
+								let len =
+									self.all_systems.lock().await.len()
+										- 1;
+								if lock.system_index >= len {
+									lock.system_index = 0;
+								} else {
+									lock.system_index += 1;
+								}
 
-							lock.gamelist_index = 0;
+								lock.gamelist_index = 0;
+							}
 						}
 						InputEvent::Left => {
-							let len =
-								self.all_systems.lock().await.len() - 1;
 							let mut lock =
 								self.orientation.lock().await;
-							if lock.system_index == 0 {
-								lock.system_index = len;
-							} else {
-								lock.system_index -= 1;
-							}
+							if !lock.menu_active {
+								let len =
+									self.all_systems.lock().await.len()
+										- 1;
+								if lock.system_index == 0 {
+									lock.system_index = len;
+								} else {
+									lock.system_index -= 1;
+								}
 
-							lock.gamelist_index = 0;
+								lock.gamelist_index = 0;
+							}
 						}
 						InputEvent::Up => {
 							let mut lock =
