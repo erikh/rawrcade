@@ -75,3 +75,23 @@ body {
   height: 30vh;
   width: auto;
 }
+
+.menu-popover {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20vh;
+  margin-bottom: 10vh;
+  width: 80vw;
+}
+
+.menu-root {
+  background-color: #aaa;
+  border: 2px solid black;
+  padding-top: 2.5vh;
+  padding-bottom: 2.5vh;
+  padding-left: 2.5vw;
+  padding-right: 2.5vw;
+  width: 65vw;
+  height: 50vh;
+  overflow-y: scroll;
+}

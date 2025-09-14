@@ -1,17 +1,15 @@
-use std::sync::atomic::AtomicPtr;
-use std::time::Duration;
-
+use gilrs::{Button, Event as GamepadEvent, Gilrs};
+use std::time::{Duration, Instant};
 use tauri::Manager;
+use tokio::sync::mpsc::Sender;
 
 mod app;
-pub use self::app::*;
 mod command;
-pub use self::command::*;
 mod gamelist;
+
+pub use self::app::*;
+pub use self::command::*;
 pub use self::gamelist::*;
-use gilrs::{Button, Event as GamepadEvent, Gilrs};
-use std::time::Instant;
-use tokio::sync::mpsc::Sender;
 
 async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut gilrs = Gilrs::new().unwrap();
@@ -19,14 +17,10 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut latest_axis: Option<(gilrs::Axis, f32)> = None;
 
 	'event_loop: loop {
-		while let Some(GamepadEvent {
-			id: _,
-			event,
-			time: _,
-			..
-		}) = gilrs.next_event()
+		while let Some(GamepadEvent { id: _, event, .. }) =
+			gilrs.next_event()
 		{
-			tracing::debug!("{:?}", event);
+			tracing::debug!("gamepad input event: {:?}", event);
 			match event {
 				gilrs::EventType::AxisChanged(x, amp, ..) => {
 					if let Some(inner) = debounce {
@@ -87,6 +81,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 						Button::DPadUp => InputEvent::Up,
 						Button::DPadLeft => InputEvent::Left,
 						Button::DPadRight => InputEvent::Right,
+						Button::Start => InputEvent::Menu,
 						_ => InputEvent::Down,
 					};
 

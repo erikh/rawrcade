@@ -1,8 +1,9 @@
-import { React, useEffect } from "react";
+import React from "react";
 import Box from "@mui/system/Box";
 import Container from "@mui/system/Container";
 import Stack from "@mui/system/Stack";
 import Grid from "@mui/system/Grid";
+import Popover from "@mui/material/Popover";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
@@ -60,7 +61,7 @@ function GameList(props) {
   const list = props.list;
   const current = props.current;
 
-  useEffect(() => {
+  React.useEffect(() => {
     populateGameListAssets(current || 0);
   }, [current]);
 
@@ -96,65 +97,73 @@ function Theme(props) {
       : {};
 
   return (
-    <Container maxWidth="100%">
-      <Stack spacing={2}>
-        <div className="section system-info">
-          <Grid container spacing={2}>
-            <Grid size={4}>
-              <div>
-                <Box className="system-banner">
+    <React.Fragment>
+      <Container maxWidth="100%">
+        <Stack spacing={2}>
+          <div className="section system-info">
+            <Grid container spacing={2}>
+              <Grid size={4}>
+                <div>
+                  <Box className="system-banner">
+                    {current_system ? (
+                      <img
+                        class="system-banner"
+                        src={`theme/${current_system.tag}.png`}
+                      />
+                    ) : (
+                      <React.Fragment />
+                    )}
+                  </Box>
+                </div>
+              </Grid>
+              <Grid size={8}>
+                <div className="system-title">
+                  <div className="vertical-spacer" />
+                  {orientation && systems.length > 0
+                    ? systems[orientation.system_index].name
+                    : "No Systems Loaded"}
+                  <div className="vertical-spacer" />
+                </div>
+              </Grid>
+            </Grid>
+          </div>
+          <div className="section">
+            <Grid container spacing={2}>
+              <Grid size={6} className="game-list">
+                <div>
                   {current_system ? (
-                    <img
-                      class="system-banner"
-                      src={`theme/${current_system.tag}.png`}
+                    <GameList
+                      list={current_system.gamelist}
+                      current={orientation ? orientation.gamelist_index : 0}
                     />
                   ) : (
-                    <React.Fragment />
+                    <NoGameList />
                   )}
-                </Box>
-              </div>
-            </Grid>
-            <Grid size={8}>
-              <div className="system-title">
-                <div className="vertical-spacer" />
-                {orientation && systems.length > 0
-                  ? systems[orientation.system_index].name
-                  : "No Systems Loaded"}
-                <div className="vertical-spacer" />
-              </div>
-            </Grid>
-          </Grid>
-        </div>
-        <div className="section">
-          <Grid container spacing={2}>
-            <Grid size={6} className="game-list">
-              <div>
-                {current_system ? (
-                  <GameList
-                    list={current_system.gamelist}
-                    current={orientation ? orientation.gamelist_index : 0}
-                  />
+                </div>
+              </Grid>
+              <Grid size={6} className="current-game">
+                {CURRENT_GAMELIST_ASSETS ? (
+                  CURRENT_GAMELIST_ASSETS.image
                 ) : (
-                  <NoGameList />
+                  <div />
                 )}
-              </div>
+                {CURRENT_GAMELIST_ASSETS ? (
+                  CURRENT_GAMELIST_ASSETS.description
+                ) : (
+                  <div />
+                )}
+              </Grid>
             </Grid>
-            <Grid size={6} className="current-game">
-              {CURRENT_GAMELIST_ASSETS ? (
-                CURRENT_GAMELIST_ASSETS.image
-              ) : (
-                <div />
-              )}
-              {CURRENT_GAMELIST_ASSETS ? (
-                CURRENT_GAMELIST_ASSETS.description
-              ) : (
-                <div />
-              )}
-            </Grid>
-          </Grid>
-        </div>
-      </Stack>
-    </Container>
+          </div>
+        </Stack>
+      </Container>
+      <Popover
+        className="menu-popover"
+        open={orientation && orientation.menu_active}
+      >
+        <div className="menu-root">test</div>
+      </Popover>
+    </React.Fragment>
   );
 }
 

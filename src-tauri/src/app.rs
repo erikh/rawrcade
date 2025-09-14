@@ -1,12 +1,11 @@
-use anyhow::{Result, anyhow};
+use crate::{Game, GameList};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{sync::Arc, time::Duration};
 use tokio::sync::{
 	Mutex,
 	mpsc::{Receiver, Sender, channel},
 };
-
-use crate::{Game, GameList};
 
 #[derive(Debug, Clone)]
 pub struct App {
@@ -60,6 +59,15 @@ impl App {
 				EventType::Input(e) => {
 					tracing::debug!("input event: {:?}", e);
 					match e {
+						InputEvent::Menu => {
+							let mut orientation =
+								self.orientation.lock().await;
+							orientation.menu_active =
+								!orientation.menu_active;
+							if orientation.menu_active {
+								orientation.menu_index = Some(0);
+							}
+						}
 						InputEvent::Right => {
 							let len =
 								self.all_systems.lock().await.len() - 1;
