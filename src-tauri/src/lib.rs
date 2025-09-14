@@ -1,4 +1,7 @@
-use gilrs::{Button, Event as GamepadEvent, Gilrs};
+use gilrs::{
+	Axis, Button, Event as GamepadEvent, EventType as GamepadEventType,
+	Gilrs,
+};
 use std::time::{Duration, Instant};
 use tauri::Manager;
 use tokio::sync::mpsc::Sender;
@@ -24,7 +27,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 		{
 			tracing::debug!("gamepad input event: {:?}", event);
 			match event {
-				gilrs::EventType::AxisChanged(x, amp, ..) => {
+				GamepadEventType::AxisChanged(x, amp, ..) => {
 					if let Some(inner) = debounce {
 						if Instant::now() - inner
 							< Duration::from_millis(200)
@@ -50,7 +53,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 					}
 
 					let event = match x {
-						gilrs::Axis::LeftStickY => {
+						Axis::LeftStickY => {
 							if amp > 0.5 {
 								Some(InputEvent::Up)
 							} else if amp < -0.5 {
@@ -59,7 +62,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 								None
 							}
 						}
-						gilrs::Axis::LeftStickX => {
+						Axis::LeftStickX => {
 							if amp > 0.5 {
 								Some(InputEvent::Right)
 							} else if amp < -0.5 {
@@ -77,7 +80,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 						let _ = sender.send(event).await;
 					}
 				}
-				gilrs::EventType::ButtonPressed(x, ..) => {
+				GamepadEventType::ButtonPressed(x, ..) => {
 					let event = match x {
 						Button::DPadDown => InputEvent::Down,
 						Button::DPadUp => InputEvent::Up,
