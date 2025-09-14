@@ -60,6 +60,39 @@ impl App {
 				EventType::Input(e) => {
 					tracing::debug!("input event: {:?}", e);
 					match e {
+						InputEvent::Cancel => {
+							let mut orientation =
+								self.orientation.lock().await;
+
+							if orientation.menu_active {
+								orientation.menu_active = false;
+								orientation.menu_index = None;
+								orientation.menu_item_index = None;
+							}
+						}
+						InputEvent::Ok => {
+							let orientation =
+								self.orientation.lock().await;
+
+							if orientation.menu_active {
+							} else {
+								let system = &self
+									.all_systems
+									.lock()
+									.await
+									.system[orientation.system_index];
+
+								// FIXME: error handling
+								let _ = std::process::Command::new(
+									"/bin/sh",
+								)
+								.args(vec![
+									"-c",
+									system.command.as_str(),
+								])
+								.status();
+							}
+						}
 						InputEvent::Menu => {
 							let mut orientation =
 								self.orientation.lock().await;

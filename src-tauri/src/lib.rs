@@ -87,6 +87,8 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 						Button::DPadLeft => InputEvent::Left,
 						Button::DPadRight => InputEvent::Right,
 						Button::Start => InputEvent::Menu,
+						Button::South => InputEvent::Ok,
+						Button::East => InputEvent::Cancel,
 						_ => InputEvent::Down,
 					};
 
