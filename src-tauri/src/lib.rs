@@ -22,7 +22,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut latest_axis: Option<(gilrs::Axis, f32)> = None;
 
 	'event_loop: loop {
-		while let Some(GamepadEvent { id: _, event, .. }) =
+		if let Some(GamepadEvent { id: _, event, .. }) =
 			gilrs.next_event()
 		{
 			tracing::debug!("gamepad input event: {:?}", event);
@@ -96,6 +96,8 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 				}
 				_ => {}
 			}
+		} else {
+			tokio::time::sleep(Duration::from_millis(200)).await;
 		}
 	}
 }
