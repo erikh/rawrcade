@@ -1,7 +1,14 @@
-use crate::{Game, GameList, SystemList};
+use crate::{APP_HANDLE, Game, GameList, SystemList};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use std::{sync::Arc, time::Duration};
+use std::{
+	sync::{
+		Arc,
+		atomic::{AtomicBool, Ordering},
+	},
+	time::Duration,
+};
+use tauri::Manager;
 use tokio::sync::{
 	Mutex,
 	mpsc::{Receiver, Sender, channel},
@@ -14,6 +21,7 @@ pub struct App {
 	pub input_send: Sender<InputEvent>,
 
 	input_recv: Arc<Mutex<Receiver<InputEvent>>>,
+	ignore_events: Arc<AtomicBool>,
 }
 
 impl Default for App {
@@ -39,6 +47,7 @@ impl Default for App {
 			input_recv: Arc::new(Mutex::new(r)),
 			all_systems: Arc::new(Mutex::new(all_systems)),
 			orientation: Arc::new(Mutex::new(Orientation::default())),
+			ignore_events: Default::default(),
 		}
 	}
 }
@@ -56,6 +65,11 @@ impl App {
 
 	pub async fn event_loop(&self) {
 		while let Ok(event) = self.next_event().await {
+			if self.ignore_events.load(Ordering::SeqCst) {
+				tokio::time::sleep(Duration::from_millis(500)).await;
+				continue;
+			}
+
 			match event.typ {
 				EventType::Input(e) => {
 					tracing::debug!("input event: {:?}", e);
@@ -82,6 +96,23 @@ impl App {
 									.await
 									.system[orientation.system_index];
 
+								if let Some(app_handle) =
+									APP_HANDLE.get()
+								{
+									if let Some(window) =
+										app_handle.get_window("main")
+									{
+										window
+											.set_fullscreen(false)
+											.expect(
+												"Could not unset fullscreen state",
+											);
+									}
+								}
+
+								self.ignore_events
+									.store(true, Ordering::SeqCst);
+
 								// FIXME: error handling
 								let _ = std::process::Command::new(
 									"/bin/sh",
@@ -91,6 +122,23 @@ impl App {
 									system.command.as_str(),
 								])
 								.status();
+
+								self.ignore_events
+									.store(false, Ordering::SeqCst);
+
+								if let Some(app_handle) =
+									APP_HANDLE.get()
+								{
+									if let Some(window) =
+										app_handle.get_window("main")
+									{
+										window
+											.set_fullscreen(true)
+											.expect(
+												"Could not set fullscreen state",
+											);
+									}
+								}
 							}
 						}
 						InputEvent::Menu => {

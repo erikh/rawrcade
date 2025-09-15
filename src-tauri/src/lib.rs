@@ -2,8 +2,9 @@ use gilrs::{
 	Axis, Button, Event as GamepadEvent, EventType as GamepadEventType,
 	Gilrs,
 };
+use std::sync::OnceLock;
 use std::time::{Duration, Instant};
-use tauri::Manager;
+use tauri::{AppHandle, Manager};
 use tokio::sync::mpsc::Sender;
 
 mod app;
@@ -15,6 +16,8 @@ pub use self::app::*;
 pub use self::command::*;
 pub use self::gamelist::*;
 pub use self::systems::*;
+
+pub static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
 
 async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut gilrs = Gilrs::new().unwrap();
@@ -108,7 +111,7 @@ pub fn run() {
 	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()
-		.with_max_level(tracing::Level::DEBUG) // Set the maximum level to log
+		.with_max_level(tracing::Level::DEBUG)
 		.init();
 
 	let sender = appdata.input_send.clone();
@@ -121,7 +124,22 @@ pub fn run() {
 		async move { inner.event_loop().await },
 	);
 
-	tauri::Builder::default()
+	// initial fullscreen
+	// FIXME: should probably replace this code once program settings have arrived
+	tauri::async_runtime::spawn(async {
+		loop {
+			if let Some(app_handle) = APP_HANDLE.get() {
+				if let Some(window) = app_handle.get_window("main") {
+					window.set_fullscreen(true).unwrap();
+					return;
+				}
+			}
+		}
+	});
+
+	let context = tauri::generate_context!();
+
+	let builder = tauri::Builder::default()
 		.setup(|app| {
 			app.manage(appdata);
 			Ok(())
@@ -134,6 +152,9 @@ pub fn run() {
 			current_text,
 			menu,
 		])
-		.run(tauri::generate_context!())
-		.expect("error while running tauri application");
+		.build(context)
+		.unwrap();
+
+	APP_HANDLE.set(builder.app_handle().clone()).unwrap();
+	builder.run(|_, _| {});
 }
