@@ -66,7 +66,6 @@ impl App {
 	pub async fn event_loop(&self) {
 		while let Ok(event) = self.next_event().await {
 			if self.ignore_events.load(Ordering::SeqCst) {
-				tokio::time::sleep(Duration::from_millis(500)).await;
 				continue;
 			}
 
