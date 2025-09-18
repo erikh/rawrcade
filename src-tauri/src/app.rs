@@ -113,31 +113,47 @@ impl App {
 									.store(true, Ordering::SeqCst);
 
 								// FIXME: error handling
-								let _ = std::process::Command::new(
-									"/bin/sh",
-								)
-								.args(vec![
-									"-c",
-									system.command.as_str(),
-								])
-								.status();
+								let mut child =
+									std::process::Command::new(
+										"/bin/sh",
+									)
+									.args(vec![
+										"-c",
+										system.command.as_str(),
+									])
+									.spawn()
+									.expect(
+										"Could not boot emulator command",
+									);
 
-								self.ignore_events
-									.store(false, Ordering::SeqCst);
+								let s = self.clone();
 
-								if let Some(app_handle) =
-									APP_HANDLE.get()
-								{
-									if let Some(window) =
-										app_handle.get_window("main")
-									{
-										window
-											.set_fullscreen(true)
-											.expect(
-												"Could not set fullscreen state",
-											);
-									}
-								}
+								tauri::async_runtime::spawn(
+									async move {
+										let _ = child.wait();
+										s.ignore_events.store(
+											false,
+											Ordering::SeqCst,
+										);
+
+										if let Some(app_handle) =
+											APP_HANDLE.get()
+										{
+											if let Some(window) =
+												app_handle
+													.get_window("main")
+											{
+												window
+													.set_fullscreen(
+														true,
+													)
+													.expect(
+														"Could not set fullscreen state",
+													);
+											}
+										}
+									},
+								);
 							}
 						}
 						InputEvent::Menu => {
