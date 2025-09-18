@@ -29,3 +29,15 @@ pub struct System {
 	#[serde(skip_deserializing)]
 	pub gamelist: Vec<Game>,
 }
+
+impl System {
+	pub fn get_command(&self, path: PathBuf) -> String {
+		let rom = shell_escape::escape(path.to_string_lossy());
+		let basename = path.file_name().unwrap();
+
+		self.command
+			.replace("%ROM%", &rom)
+			.replace("%ROM_RAW", &path.to_string_lossy())
+			.replace("%BASENAME%", &basename.to_string_lossy())
+	}
+}

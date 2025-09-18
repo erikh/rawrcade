@@ -112,14 +112,22 @@ impl App {
 								self.ignore_events
 									.store(true, Ordering::SeqCst);
 
+								let game = system.gamelist
+									[orientation.gamelist_index]
+									.clone();
+
+								let command = system.get_command(
+									game.path.expect(
+										"Need a path to the rom in gamelist.xml",
+									),
+								);
+
+								let args = vec!["-c", &command];
 								let mut child =
 									std::process::Command::new(
 										"/bin/sh",
 									)
-									.args(vec![
-										"-c",
-										system.command.as_str(),
-									])
+									.args(args)
 									.spawn()
 									// FIXME: probably should do something better here
 									.expect(

@@ -45,7 +45,7 @@ All systems must be contained within the <systemList> tag.-->
 	<system>
 		<name>MAME</name>
 		<fullname>MAME</fullname>
-		<path>~/roms/mame</path>
+    <path>~/es/roms/mame</path>
 
 		<!-- A list of extensions to search for, delimited by any of the whitespace characters (", \r\n\t").
 		You MUST include the period at the start of the extension! It's also case sensitive. -->
@@ -55,7 +55,7 @@ All systems must be contained within the <systemList> tag.-->
 		%ROM% is replaced by a bash-special-character-escaped absolute path to the ROM.
 		%BASENAME% is replaced by the "base" name of the ROM.  For example, "/foo/bar.rom" would have a basename of "bar". Useful for MAME.
 		%ROM_RAW% is the raw, unescaped path to the ROM. -->
-    <command>retroarch</command>
+    <command>retroarch -L nestopia %ROM%</command>
 
 		<!-- The platform to use when scraping. You can see the full list of accepted platforms in src/PlatformIds.cpp.
 		It's case sensitive, but everything is lowercase. This tag is optional.
