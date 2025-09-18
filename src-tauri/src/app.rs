@@ -112,7 +112,6 @@ impl App {
 								self.ignore_events
 									.store(true, Ordering::SeqCst);
 
-								// FIXME: error handling
 								let mut child =
 									std::process::Command::new(
 										"/bin/sh",
@@ -122,6 +121,7 @@ impl App {
 										system.command.as_str(),
 									])
 									.spawn()
+									// FIXME: probably should do something better here
 									.expect(
 										"Could not boot emulator command",
 									);
