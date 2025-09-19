@@ -14,6 +14,40 @@ use tokio::sync::{
 	mpsc::{Receiver, Sender, channel},
 };
 
+enum MenuItems {
+	One,
+	Two,
+	Three,
+	Four,
+	Exit,
+}
+
+impl From<usize> for MenuItems {
+	fn from(value: usize) -> Self {
+		match value {
+			0 => MenuItems::One,
+			1 => MenuItems::Two,
+			2 => MenuItems::Three,
+			3 => MenuItems::Four,
+			4 => MenuItems::Exit,
+			_ => panic!("Invalid menu item"),
+		}
+	}
+}
+
+impl ToString for MenuItems {
+	fn to_string(&self) -> String {
+		match self {
+			MenuItems::One => "One",
+			MenuItems::Two => "Two",
+			MenuItems::Three => "Three",
+			MenuItems::Four => "Four",
+			MenuItems::Exit => "Exit",
+		}
+		.to_string()
+	}
+}
+
 #[derive(Debug, Clone)]
 pub struct App {
 	pub all_systems: Arc<Mutex<SystemList>>,
@@ -55,11 +89,11 @@ impl Default for App {
 impl App {
 	pub fn menu(&self) -> Vec<String> {
 		vec![
-			"One".into(),
-			"Two".into(),
-			"Three".into(),
-			"Four".into(),
-			"Five".into(),
+			MenuItems::One.to_string(),
+			MenuItems::Two.to_string(),
+			MenuItems::Three.to_string(),
+			MenuItems::Four.to_string(),
+			MenuItems::Exit.to_string(),
 		]
 	}
 
@@ -88,11 +122,13 @@ impl App {
 								self.orientation.lock().await;
 
 							if orientation.menu_active {
-								if let Some(menu_index) =
+								if let Some(idx) =
 									orientation.menu_index
 								{
-									match menu_index {
-										4 => std::process::exit(0),
+									match MenuItems::from(idx) {
+										MenuItems::Exit => {
+											std::process::exit(0)
+										}
 										_ => {}
 									}
 								}
