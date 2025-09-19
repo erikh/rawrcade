@@ -15,21 +15,23 @@ use tokio::sync::{
 };
 
 enum MenuItems {
-	One,
-	Two,
-	Three,
+	Settings,
+	Themes,
 	Fullscreen,
 	Exit,
+	Reboot,
+	Shutdown,
 }
 
 impl From<usize> for MenuItems {
 	fn from(value: usize) -> Self {
 		match value {
-			0 => MenuItems::One,
-			1 => MenuItems::Two,
-			2 => MenuItems::Three,
-			3 => MenuItems::Fullscreen,
-			4 => MenuItems::Exit,
+			0 => MenuItems::Settings,
+			1 => MenuItems::Themes,
+			2 => MenuItems::Fullscreen,
+			3 => MenuItems::Exit,
+			4 => MenuItems::Reboot,
+			5 => MenuItems::Shutdown,
 			_ => panic!("Invalid menu item"),
 		}
 	}
@@ -38,11 +40,12 @@ impl From<usize> for MenuItems {
 impl ToString for MenuItems {
 	fn to_string(&self) -> String {
 		match self {
-			MenuItems::One => "One",
-			MenuItems::Two => "Two",
-			MenuItems::Three => "Three",
+			MenuItems::Settings => "Settings",
+			MenuItems::Themes => "Themes",
 			MenuItems::Fullscreen => "Toggle Fullscreen Window",
-			MenuItems::Exit => "Exit",
+			MenuItems::Exit => "Exit RAWRcade",
+			MenuItems::Reboot => "Reboot System",
+			MenuItems::Shutdown => "Shutdown System",
 		}
 		.to_string()
 	}
@@ -89,11 +92,12 @@ impl Default for App {
 impl App {
 	pub fn menu(&self) -> Vec<String> {
 		vec![
-			MenuItems::One.to_string(),
-			MenuItems::Two.to_string(),
-			MenuItems::Three.to_string(),
+			MenuItems::Settings.to_string(),
+			MenuItems::Themes.to_string(),
 			MenuItems::Fullscreen.to_string(),
 			MenuItems::Exit.to_string(),
+			MenuItems::Reboot.to_string(),
+			MenuItems::Shutdown.to_string(),
 		]
 	}
 
@@ -126,6 +130,22 @@ impl App {
 									orientation.menu_index
 								{
 									match MenuItems::from(idx) {
+										MenuItems::Reboot => {
+											std::process::Command::new(
+												"reboot",
+											)
+											.status()
+											.expect("could not reboot");
+										}
+										MenuItems::Shutdown => {
+											std::process::Command::new(
+												"poweroff",
+											)
+											.status()
+											.expect(
+												"could not poweroff",
+											);
+										}
 										MenuItems::Fullscreen => {
 											if let Some(app_handle) =
 												APP_HANDLE.get()
