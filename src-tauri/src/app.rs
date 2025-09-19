@@ -18,7 +18,7 @@ enum MenuItems {
 	One,
 	Two,
 	Three,
-	Four,
+	Fullscreen,
 	Exit,
 }
 
@@ -28,7 +28,7 @@ impl From<usize> for MenuItems {
 			0 => MenuItems::One,
 			1 => MenuItems::Two,
 			2 => MenuItems::Three,
-			3 => MenuItems::Four,
+			3 => MenuItems::Fullscreen,
 			4 => MenuItems::Exit,
 			_ => panic!("Invalid menu item"),
 		}
@@ -41,7 +41,7 @@ impl ToString for MenuItems {
 			MenuItems::One => "One",
 			MenuItems::Two => "Two",
 			MenuItems::Three => "Three",
-			MenuItems::Four => "Four",
+			MenuItems::Fullscreen => "Toggle Fullscreen Window",
 			MenuItems::Exit => "Exit",
 		}
 		.to_string()
@@ -92,7 +92,7 @@ impl App {
 			MenuItems::One.to_string(),
 			MenuItems::Two.to_string(),
 			MenuItems::Three.to_string(),
-			MenuItems::Four.to_string(),
+			MenuItems::Fullscreen.to_string(),
 			MenuItems::Exit.to_string(),
 		]
 	}
@@ -126,6 +126,30 @@ impl App {
 									orientation.menu_index
 								{
 									match MenuItems::from(idx) {
+										MenuItems::Fullscreen => {
+											if let Some(app_handle) =
+												APP_HANDLE.get()
+											{
+												if let Some(window) =
+													app_handle
+														.get_window(
+															"main",
+														) {
+													window
+														.set_fullscreen(
+															!window
+																.is_fullscreen(
+																)
+																.expect(
+																	"could not toggle fullscreen",
+																),
+														)
+														.expect(
+															"Could not unset fullscreen state",
+														);
+												}
+											}
+										}
 										MenuItems::Exit => {
 											std::process::exit(0)
 										}
@@ -139,17 +163,27 @@ impl App {
 									.await
 									.system[orientation.system_index];
 
+								let mut is_fullscreen = false;
+
 								if let Some(app_handle) =
 									APP_HANDLE.get()
 								{
 									if let Some(window) =
 										app_handle.get_window("main")
 									{
-										window
-											.set_fullscreen(false)
+										is_fullscreen = window
+											.is_fullscreen()
 											.expect(
-												"Could not unset fullscreen state",
+												"could not get fullscreen state",
 											);
+
+										if is_fullscreen {
+											window
+												.set_fullscreen(false)
+												.expect(
+													"Could not unset fullscreen state",
+												);
+										}
 									}
 								}
 
@@ -197,7 +231,7 @@ impl App {
 											{
 												window
 													.set_fullscreen(
-														true,
+														is_fullscreen,
 													)
 													.expect(
 														"Could not set fullscreen state",
