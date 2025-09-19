@@ -88,6 +88,14 @@ impl App {
 								self.orientation.lock().await;
 
 							if orientation.menu_active {
+								if let Some(menu_index) =
+									orientation.menu_index
+								{
+									match menu_index {
+										4 => std::process::exit(0),
+										_ => {}
+									}
+								}
 							} else {
 								let system = &self
 									.all_systems
