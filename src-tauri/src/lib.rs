@@ -9,11 +9,13 @@ use tokio::sync::mpsc::Sender;
 
 mod app;
 mod command;
+mod config;
 mod gamelist;
 mod systems;
 
 pub use self::app::*;
 pub use self::command::*;
+pub use self::config::*;
 pub use self::gamelist::*;
 pub use self::systems::*;
 
@@ -107,7 +109,11 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let appdata = App::default();
+	let path = dirs::config_dir()
+		.unwrap_or(dirs::home_dir().unwrap_or("/".into()));
+
+	let appdata = App::new(&path.join(DEFAULT_CONFIG_FILENAME))
+		.expect("could not initialize application");
 	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()

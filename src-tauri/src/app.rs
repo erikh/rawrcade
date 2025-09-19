@@ -1,7 +1,8 @@
-use crate::{APP_HANDLE, Game, GameList, SystemList};
+use crate::{APP_HANDLE, Config, Game, GameList, SystemList};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{
+	path::PathBuf,
 	sync::{
 		Arc,
 		atomic::{AtomicBool, Ordering},
@@ -53,6 +54,7 @@ impl ToString for MenuItems {
 
 #[derive(Debug, Clone)]
 pub struct App {
+	pub config: Config,
 	pub all_systems: Arc<Mutex<SystemList>>,
 	pub orientation: Arc<Mutex<Orientation>>,
 	pub input_send: Sender<InputEvent>,
@@ -80,6 +82,7 @@ impl Default for App {
 		let (s, r) = channel(1000);
 
 		Self {
+			config: Config::default(),
 			input_send: s,
 			input_recv: Arc::new(Mutex::new(r)),
 			all_systems: Arc::new(Mutex::new(all_systems)),
@@ -90,6 +93,15 @@ impl Default for App {
 }
 
 impl App {
+	pub fn new(config_filename: &PathBuf) -> Result<Self> {
+		let mut this = Self::default();
+		if let Ok(config) = Config::from_file(config_filename) {
+			this.config = config
+		}
+
+		Ok(this)
+	}
+
 	pub fn menu(&self) -> Vec<String> {
 		vec![
 			MenuItems::Settings.to_string(),

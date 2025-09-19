@@ -32,6 +32,7 @@ quick-xml = { version = "*", features = [ "serialize" ] }
 thiserror = "*"
 base64 = "*"
 shell-escape = "*"
+dirs = "*"
 
 [dev-dependencies]
 xml = "*"
