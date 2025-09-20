@@ -7,7 +7,8 @@ import Popover from "@mui/material/Popover";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
-let CURRENT_MENU_TYPES = {};
+let CURRENT_MENU_VALUES = [];
+let CURRENT_MENU_TYPES = [];
 let CURRENT_MENU = [];
 let CURRENT_MENU_INDEX = [];
 let CURRENT_GAMELIST_ASSETS = null;
@@ -102,7 +103,11 @@ function Theme(props) {
   React.useEffect(() => {
     if (orientation && orientation.menu_item_index === null) {
       console.log("fetching menu");
-      invoke("menu").then((x) => (CURRENT_MENU = x));
+      invoke("menu").then((x) => {
+        CURRENT_MENU = x;
+        CURRENT_MENU_VALUES = [];
+        CURRENT_MENU_TYPES = [];
+      });
     }
   }, [
     orientation && orientation.menu_item_index === null
@@ -147,8 +152,21 @@ function Theme(props) {
       switch (orientation.menu_index) {
         case 0: {
           console.log("fetching settings submenu & types");
-          invoke("settings_menu").then((x) => (CURRENT_MENU = x));
-          invoke("setting_types").then((x) => (CURRENT_MENU_TYPES = x));
+          invoke("settings_menu").then((x) => {
+            CURRENT_MENU = x;
+            invoke("setting_types").then((x) => {
+              CURRENT_MENU_TYPES = x;
+              CURRENT_MENU_VALUES = [];
+
+              CURRENT_MENU.forEach((_, x) => {
+                invoke("setting_value", { setting: x }).then((value) => {
+                  CURRENT_MENU_VALUES[x] = value;
+                });
+              });
+
+              console.log(CURRENT_MENU_VALUES);
+            });
+          });
         }
       }
     }
@@ -224,25 +242,71 @@ function Theme(props) {
         <div className="menu-root">
           {CURRENT_MENU.map((item, i) =>
             CURRENT_MENU_INDEX == i ? (
-              <div className="menu-item menu-selected">{item}</div>
+              <div className="menu-item menu-selected">
+                {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
+              </div>
             ) : i == CURRENT_MENU_INDEX - 1 && i == 0 ? (
               <div className="menu-item menu-not-selected-previous-first-item">
                 {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
               </div>
             ) : i == CURRENT_MENU_INDEX - 1 ? (
               <div className="menu-item menu-not-selected-previous-item">
                 {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
               </div>
             ) : i == CURRENT_MENU_INDEX + 1 ? (
               <div className="menu-item menu-not-selected-next-item">
                 {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
               </div>
             ) : i == 0 ? (
               <div className="menu-item menu-not-selected-first-item">
                 {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
               </div>
             ) : (
-              <div className="menu-item menu-not-selected">{item}</div>
+              <div className="menu-item menu-not-selected">
+                {item}
+                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
+                  <span style={{ float: "right" }}>
+                    {CURRENT_MENU_VALUES[i]}
+                  </span>
+                ) : (
+                  <React.Fragment />
+                )}
+              </div>
             )
           )}
         </div>

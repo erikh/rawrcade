@@ -164,19 +164,21 @@ impl App {
 		]
 	}
 
-	pub fn settings_menu(&self) -> Vec<String> {
+	pub fn settings_menu(&self) -> Vec<ConfigSettings> {
 		vec![
-			ConfigSettings::SwapConfirm.to_string(),
-			ConfigSettings::StartFullscreen.to_string(),
-			ConfigSettings::Theme.to_string(),
-			ConfigSettings::EnableKeyboard.to_string(),
+			ConfigSettings::SwapConfirm,
+			ConfigSettings::StartFullscreen,
+			ConfigSettings::Theme,
+			ConfigSettings::EnableKeyboard,
 		]
 	}
 
-	pub async fn setting_value(&self, setting: ConfigSettings) -> SettingTypes {
+	pub async fn setting_value(&self, setting: usize) -> SettingTypes {
+		let settings = self.settings_menu();
+
 		let config = self.config.lock().await;
 
-		match setting {
+		match settings[setting] {
 			ConfigSettings::SwapConfirm => SettingTypes::Boolean(config.swap_confirm),
 			ConfigSettings::StartFullscreen => SettingTypes::Boolean(config.start_fullscreen),
 			ConfigSettings::Theme => SettingTypes::OptionString(config.theme.clone()),

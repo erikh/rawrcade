@@ -1,4 +1,4 @@
-use crate::{ConfigSettings, SettingTypes};
+use crate::SettingTypes;
 
 use super::{App, Orientation, System};
 use serde::{Deserialize, Serialize};
@@ -7,7 +7,7 @@ use tauri::State;
 
 #[tauri::command]
 pub async fn setting_value(
-	state: State<'_, App>, setting: ConfigSettings,
+	state: State<'_, App>, setting: usize,
 ) -> std::result::Result<String, ()> {
 	tracing::debug!("settings value requested for setting: {}", setting);
 
@@ -28,7 +28,11 @@ pub fn setting_types(state: State<'_, App>) -> Vec<String> {
 #[tauri::command]
 pub fn settings_menu(state: State<'_, App>) -> Vec<String> {
 	tracing::debug!("settings menu requested");
-	state.settings_menu()
+	state
+		.settings_menu()
+		.iter()
+		.map(ToString::to_string)
+		.collect()
 }
 
 #[tauri::command]
