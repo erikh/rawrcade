@@ -147,6 +147,7 @@ function Theme(props) {
 
   React.useEffect(() => {
     console.log("submenu trigger");
+    let interval = null;
     if (orientation && orientation.menu_item_index !== null) {
       console.log("finding submenu");
       switch (orientation.menu_index) {
@@ -164,12 +165,26 @@ function Theme(props) {
                 });
               });
 
+              interval = setInterval(() => {
+                CURRENT_MENU_VALUES = [];
+
+                CURRENT_MENU.forEach((_, x) => {
+                  invoke("setting_value", { setting: x }).then((value) => {
+                    CURRENT_MENU_VALUES[x] = value;
+                  });
+                });
+              }, 100);
+
               console.log(CURRENT_MENU_VALUES);
             });
           });
         }
       }
     }
+
+    return () => {
+      interval && clearInterval(interval);
+    };
   }, [
     orientation &&
       orientation.menu_active &&

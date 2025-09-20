@@ -8,15 +8,17 @@ use tauri::State;
 #[tauri::command]
 pub async fn setting_value(
 	state: State<'_, App>, setting: usize,
-) -> std::result::Result<String, ()> {
+) -> std::result::Result<Option<String>, ()> {
 	tracing::debug!("settings value requested for setting: {}", setting);
-
-	let res = match state.setting_value(setting).await {
-		SettingTypes::Boolean(b) => serde_json::to_string(&b),
-		SettingTypes::OptionString(os) => serde_json::to_string(&os),
-	};
-
-	Ok(res.unwrap())
+	if let Some(config_setting) = state.setting_value(setting).await {
+		let res = match config_setting {
+			SettingTypes::Boolean(b) => serde_json::to_string(&b),
+			SettingTypes::OptionString(os) => serde_json::to_string(&os),
+		};
+		Ok(Some(res.unwrap()))
+	} else {
+		Ok(None)
+	}
 }
 
 #[tauri::command]

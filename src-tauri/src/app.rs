@@ -173,16 +173,20 @@ impl App {
 		]
 	}
 
-	pub async fn setting_value(&self, setting: usize) -> SettingTypes {
+	pub async fn setting_value(&self, setting: usize) -> Option<SettingTypes> {
 		let settings = self.settings_menu();
 
 		let config = self.config.lock().await;
 
-		match settings[setting] {
-			ConfigSettings::SwapConfirm => SettingTypes::Boolean(config.swap_confirm),
-			ConfigSettings::StartFullscreen => SettingTypes::Boolean(config.start_fullscreen),
-			ConfigSettings::Theme => SettingTypes::OptionString(config.theme.clone()),
-			ConfigSettings::EnableKeyboard => SettingTypes::Boolean(config.enable_keyboard),
+		if let Some(config_setting) = settings.get(setting) {
+			Some(match config_setting {
+				ConfigSettings::SwapConfirm => SettingTypes::Boolean(config.swap_confirm),
+				ConfigSettings::StartFullscreen => SettingTypes::Boolean(config.start_fullscreen),
+				ConfigSettings::Theme => SettingTypes::OptionString(config.theme.clone()),
+				ConfigSettings::EnableKeyboard => SettingTypes::Boolean(config.enable_keyboard),
+			})
+		} else {
+			None
 		}
 	}
 
