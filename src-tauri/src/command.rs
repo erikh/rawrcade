@@ -12,6 +12,7 @@ pub fn setting_type(config_setting: ConfigSettings) -> String {
 
 #[tauri::command]
 pub fn settings_menu(state: State<'_, App>) -> Vec<String> {
+	tracing::debug!("settings menu requested");
 	state.settings_menu()
 }
 

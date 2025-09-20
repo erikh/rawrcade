@@ -183,9 +183,13 @@ impl App {
 							let mut orientation = self.orientation.lock().await;
 
 							if orientation.menu_active {
-								orientation.menu_active = false;
-								orientation.menu_index = None;
-								orientation.menu_item_index = None;
+								if let Some(_) = orientation.menu_item_index {
+									orientation.menu_item_index = None;
+								} else {
+									orientation.menu_active = false;
+									orientation.menu_index = None;
+									orientation.menu_item_index = None;
+								}
 							}
 						}
 						InputEvent::Ok => {
@@ -212,7 +216,10 @@ impl App {
 													}
 												}
 											}
-											None => orientation.menu_item_index = Some(0),
+											None => {
+												tracing::debug!("initializing inner menu state");
+												orientation.menu_item_index = Some(0);
+											}
 										},
 										MenuItems::Reboot => {
 											self.config
@@ -363,10 +370,19 @@ impl App {
 							if lock.menu_active {
 								let len = self.menu().len() - 1;
 								if let Some(index) = lock.menu_index {
-									if index == 0 {
-										lock.menu_index = Some(len);
+									if let Some(inner_idx) = lock.menu_item_index {
+										if inner_idx == 0 {
+											lock.menu_item_index =
+												Some(self.settings_menu().len() - 1);
+										} else {
+											lock.menu_item_index = Some(inner_idx - 1);
+										}
 									} else {
-										lock.menu_index = Some(index - 1);
+										if index == 0 {
+											lock.menu_index = Some(len);
+										} else {
+											lock.menu_index = Some(index - 1);
+										}
 									}
 								} else {
 									lock.menu_index = Some(0)
@@ -389,10 +405,18 @@ impl App {
 								let len = self.menu().len() - 1;
 
 								if let Some(index) = lock.menu_index {
-									if index == len {
-										lock.menu_index = Some(0);
+									if let Some(inner_idx) = lock.menu_item_index {
+										if inner_idx == self.settings_menu().len() - 1 {
+											lock.menu_item_index = Some(0);
+										} else {
+											lock.menu_item_index = Some(inner_idx + 1);
+										}
 									} else {
-										lock.menu_index = Some(index + 1);
+										if index == len {
+											lock.menu_index = Some(0);
+										} else {
+											lock.menu_index = Some(index + 1);
+										}
 									}
 								} else {
 									lock.menu_index = Some(0)

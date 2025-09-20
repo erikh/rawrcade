@@ -103,6 +103,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 pub async fn run() {
 	let appdata = App::new(None).expect("could not initialize application");
 	let inner = appdata.clone();
+	let config = appdata.config.clone();
 
 	tracing_subscriber::fmt()
 		.with_max_level(Into::<tracing::Level>::into(
@@ -118,11 +119,13 @@ pub async fn run() {
 
 	// initial fullscreen
 	// FIXME: should probably replace this code once program settings have arrived
-	tauri::async_runtime::spawn(async {
+	tauri::async_runtime::spawn(async move {
 		loop {
 			if let Some(app_handle) = APP_HANDLE.get() {
 				if let Some(window) = app_handle.get_window("main") {
-					window.set_fullscreen(true).unwrap();
+					window
+						.set_fullscreen(config.lock().await.start_fullscreen)
+						.unwrap();
 					return;
 				}
 			}
@@ -144,6 +147,7 @@ pub async fn run() {
 			current_text,
 			menu,
 			setting_type,
+			settings_menu,
 		])
 		.build(context)
 		.unwrap();

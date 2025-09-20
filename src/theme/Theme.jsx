@@ -99,38 +99,61 @@ function Theme(props) {
       : {};
 
   React.useEffect(() => {
-    invoke("menu").then((x) => (CURRENT_MENU = x));
+    if (orientation && orientation.menu_item_index === null) {
+      console.log("fetching menu");
+      invoke("menu").then((x) => (CURRENT_MENU = x));
+    }
   }, [
-    orientation &&
-      orientation.menu_active &&
-      orientation.menu_index &&
-      !orientation.menu_item_index,
+    orientation && orientation.menu_item_index === null
+      ? orientation.menu_active
+      : null,
   ]);
 
   React.useEffect(() => {
-    if (orientation) {
+    if (orientation && orientation.menu_item_index === null) {
+      console.log("setting menu index");
       CURRENT_MENU_INDEX = orientation.menu_index;
     }
-  }, [orientation ? orientation.menu_index : null]);
+  }, [
+    orientation &&
+    orientation.menu_active &&
+    orientation.menu_item_index === null
+      ? orientation.menu_index
+      : null,
+  ]);
 
   React.useEffect(() => {
-    if (orientation) {
+    if (
+      orientation &&
+      orientation.menu_active &&
+      orientation.menu_item_index !== null
+    ) {
+      console.log("setting menu item index");
       CURRENT_MENU_INDEX = orientation.menu_item_index;
     }
-  }, [orientation ? orientation.menu_item_index : null]);
+  }, [
+    orientation &&
+    orientation.menu_active &&
+    orientation.menu_item_index !== null
+      ? orientation.menu_item_index
+      : null,
+  ]);
 
   React.useEffect(() => {
-    if (orientation) {
+    console.log("submenu trigger");
+    if (orientation && orientation.menu_item_index !== null) {
+      console.log("finding submenu");
       switch (orientation.menu_index) {
-        case 0:
+        case 0: {
+          console.log("fetching settings submenu");
           invoke("settings_menu").then((x) => (CURRENT_MENU = x));
+        }
       }
     }
   }, [
     orientation &&
       orientation.menu_active &&
-      orientation.menu_index &&
-      orientation.menu_item_index,
+      orientation.menu_item_index !== null,
   ]);
 
   return (
