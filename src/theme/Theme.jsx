@@ -4,6 +4,7 @@ import Container from "@mui/system/Container";
 import Stack from "@mui/system/Stack";
 import Grid from "@mui/system/Grid";
 import Popover from "@mui/material/Popover";
+import Switch from "@mui/material/Switch";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
@@ -12,6 +13,29 @@ let CURRENT_MENU_TYPES = [];
 let CURRENT_MENU = [];
 let CURRENT_MENU_INDEX = [];
 let CURRENT_GAMELIST_ASSETS = null;
+
+function pickSelector(i) {
+  switch (CURRENT_MENU_TYPES[i]) {
+    case "boolean":
+      return (
+        <Switch
+          checked={JSON.parse(CURRENT_MENU_VALUES[i])}
+          sx={{
+            border: "1px solid black",
+            alignSelf: "top",
+            alignItems: "top",
+            justifyContent: "flex-end",
+            textAlign: "center",
+            float: "right",
+          }}
+        >
+          {CURRENT_MENU_VALUES[i]}
+        </Switch>
+      );
+    case "string":
+      return <span style={{ float: "right" }}>{CURRENT_MENU_VALUES[i]}</span>;
+  }
+}
 
 async function getAsset(t) {
   return await invoke("current_asset", { assetType: t });
@@ -260,9 +284,7 @@ function Theme(props) {
               <div className="menu-item menu-selected">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
@@ -271,9 +293,7 @@ function Theme(props) {
               <div className="menu-item menu-not-selected-previous-first-item">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
@@ -282,9 +302,7 @@ function Theme(props) {
               <div className="menu-item menu-not-selected-previous-item">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
@@ -293,9 +311,7 @@ function Theme(props) {
               <div className="menu-item menu-not-selected-next-item">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
@@ -304,9 +320,7 @@ function Theme(props) {
               <div className="menu-item menu-not-selected-first-item">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
@@ -315,9 +329,7 @@ function Theme(props) {
               <div className="menu-item menu-not-selected">
                 {item}
                 {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <span style={{ float: "right" }}>
-                    {CURRENT_MENU_VALUES[i]}
-                  </span>
+                  pickSelector(i)
                 ) : (
                   <React.Fragment />
                 )}
