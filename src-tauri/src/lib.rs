@@ -1,7 +1,4 @@
-use gilrs::{
-	Axis, Button, Event as GamepadEvent, EventType as GamepadEventType,
-	Gilrs,
-};
+use gilrs::{Axis, Button, Event as GamepadEvent, EventType as GamepadEventType, Gilrs};
 use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Manager};
@@ -27,16 +24,12 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 	let mut latest_axis: Option<(gilrs::Axis, f32)> = None;
 
 	'event_loop: loop {
-		if let Some(GamepadEvent { id: _, event, .. }) =
-			gilrs.next_event()
-		{
+		if let Some(GamepadEvent { id: _, event, .. }) = gilrs.next_event() {
 			tracing::debug!("gamepad input event: {:?}", event);
 			match event {
 				GamepadEventType::AxisChanged(x, amp, ..) => {
 					if let Some(inner) = debounce {
-						if Instant::now() - inner
-							< Duration::from_millis(200)
-						{
+						if Instant::now() - inner < Duration::from_millis(200) {
 							continue 'event_loop;
 						} else {
 							debounce = None;
@@ -47,8 +40,7 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 						if inner.0 == x {
 							// NOTE: releasing the stick should not generate additional events. this
 							// fixes that.
-							if (inner.1 < 0.0 && amp > inner.1)
-								|| (inner.1 > 0.0 && amp < inner.1)
+							if (inner.1 < 0.0 && amp > inner.1) || (inner.1 > 0.0 && amp < inner.1)
 							{
 								continue 'event_loop;
 							}
@@ -109,23 +101,20 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let appdata =
-		App::new(None).expect("could not initialize application");
+	let appdata = App::new(None).expect("could not initialize application");
 	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()
-		.with_max_level(tracing::Level::DEBUG)
+		.with_max_level(Into::<tracing::Level>::into(
+			appdata.config.log_level.clone(),
+		))
 		.init();
 
 	let sender = appdata.input_send.clone();
 
-	tauri::async_runtime::spawn(async move {
-		handle_gamepad_input(sender).await
-	});
+	tauri::async_runtime::spawn(async move { handle_gamepad_input(sender).await });
 
-	tauri::async_runtime::spawn(
-		async move { inner.event_loop().await },
-	);
+	tauri::async_runtime::spawn(async move { inner.event_loop().await });
 
 	// initial fullscreen
 	// FIXME: should probably replace this code once program settings have arrived
@@ -154,6 +143,7 @@ pub fn run() {
 			current_asset,
 			current_text,
 			menu,
+			setting_type,
 		])
 		.build(context)
 		.unwrap();

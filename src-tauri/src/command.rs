@@ -1,7 +1,19 @@
+use crate::ConfigSettings;
+
 use super::{App, Orientation, System};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::State;
+
+#[tauri::command]
+pub fn setting_type(config_setting: ConfigSettings) -> String {
+	config_setting.type_for()
+}
+
+#[tauri::command]
+pub fn settings_menu(state: State<'_, App>) -> Vec<String> {
+	state.settings_menu()
+}
 
 #[tauri::command]
 pub fn menu(state: State<'_, App>) -> Vec<String> {
@@ -24,8 +36,7 @@ pub async fn current_asset(
 	let systems = state.all_systems.lock().await.system.clone();
 	let orientation = state.orientation.lock().await;
 	let current_system = &systems[orientation.system_index];
-	let current_game =
-		&current_system.gamelist[orientation.gamelist_index];
+	let current_game = &current_system.gamelist[orientation.gamelist_index];
 	let filename: Option<PathBuf> = match asset_type {
 		AssetType::Image => current_game.image.clone(),
 		AssetType::Thumbnail => current_game.thumbnail.clone(),
@@ -56,8 +67,7 @@ pub async fn current_text(
 	let systems = state.all_systems.lock().await.system.clone();
 	let orientation = state.orientation.lock().await;
 	let current_system = &systems[orientation.system_index];
-	let current_game =
-		current_system.gamelist[orientation.gamelist_index].clone();
+	let current_game = current_system.gamelist[orientation.gamelist_index].clone();
 	Ok(match text_type {
 		TextType::Description => current_game.desc,
 		TextType::Rating => current_game.rating,
@@ -66,23 +76,17 @@ pub async fn current_text(
 		TextType::Publisher => current_game.publisher,
 		TextType::Genre => current_game.genre,
 		TextType::Players => current_game.players,
-		TextType::PlayCount => {
-			current_game.playcount.map(|x| x.to_string())
-		}
+		TextType::PlayCount => current_game.playcount.map(|x| x.to_string()),
 		TextType::LastPlayed => current_game.lastplayed,
 	})
 }
 
 #[tauri::command]
-pub async fn all_systems(
-	state: State<'_, App>,
-) -> std::result::Result<Vec<System>, ()> {
+pub async fn all_systems(state: State<'_, App>) -> std::result::Result<Vec<System>, ()> {
 	Ok(state.all_systems.clone().lock_owned().await.system.clone())
 }
 
 #[tauri::command]
-pub async fn current_orientation(
-	state: State<'_, App>,
-) -> std::result::Result<Orientation, ()> {
+pub async fn current_orientation(state: State<'_, App>) -> std::result::Result<Orientation, ()> {
 	Ok(state.orientation.clone().lock_owned().await.clone())
 }

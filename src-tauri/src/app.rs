@@ -15,6 +15,50 @@ use tokio::sync::{
 	mpsc::{Receiver, Sender, channel},
 };
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ConfigSettings {
+	SwapConfirm,
+	StartFullscreen,
+	Theme,
+	EnableKeyboard,
+}
+
+impl ConfigSettings {
+	pub fn type_for(&self) -> String {
+		match self {
+			Self::SwapConfirm => "boolean",
+			Self::StartFullscreen => "boolean",
+			Self::Theme => "string",
+			Self::EnableKeyboard => "boolean",
+		}
+		.to_string()
+	}
+}
+
+impl From<usize> for ConfigSettings {
+	fn from(value: usize) -> Self {
+		match value {
+			0 => Self::SwapConfirm,
+			1 => Self::StartFullscreen,
+			2 => Self::Theme,
+			3 => Self::EnableKeyboard,
+			_ => panic!("Invalid menu item"),
+		}
+	}
+}
+
+impl ToString for ConfigSettings {
+	fn to_string(&self) -> String {
+		match self {
+			ConfigSettings::SwapConfirm => "Japanese-style Input",
+			ConfigSettings::StartFullscreen => "Start in Fullscreen",
+			ConfigSettings::Theme => "Set Theme",
+			ConfigSettings::EnableKeyboard => "Enable Keyboard",
+		}
+		.to_string()
+	}
+}
+
 enum MenuItems {
 	Settings,
 	Themes,
@@ -27,12 +71,12 @@ enum MenuItems {
 impl From<usize> for MenuItems {
 	fn from(value: usize) -> Self {
 		match value {
-			0 => MenuItems::Settings,
-			1 => MenuItems::Themes,
-			2 => MenuItems::Fullscreen,
-			3 => MenuItems::Exit,
-			4 => MenuItems::Reboot,
-			5 => MenuItems::Shutdown,
+			0 => Self::Settings,
+			1 => Self::Themes,
+			2 => Self::Fullscreen,
+			3 => Self::Exit,
+			4 => Self::Reboot,
+			5 => Self::Shutdown,
 			_ => panic!("Invalid menu item"),
 		}
 	}
@@ -113,6 +157,15 @@ impl App {
 			MenuItems::Exit.to_string(),
 			MenuItems::Reboot.to_string(),
 			MenuItems::Shutdown.to_string(),
+		]
+	}
+
+	pub fn settings_menu(&self) -> Vec<String> {
+		vec![
+			ConfigSettings::SwapConfirm.to_string(),
+			ConfigSettings::StartFullscreen.to_string(),
+			ConfigSettings::Theme.to_string(),
+			ConfigSettings::EnableKeyboard.to_string(),
 		]
 	}
 
