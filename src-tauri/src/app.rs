@@ -23,6 +23,12 @@ pub enum ConfigSettings {
 	EnableKeyboard,
 }
 
+#[derive(Debug, Clone)]
+pub enum SettingTypes {
+	Boolean(bool),
+	OptionString(Option<String>),
+}
+
 impl ConfigSettings {
 	pub fn type_for(&self) -> String {
 		match self {
@@ -164,6 +170,26 @@ impl App {
 			ConfigSettings::StartFullscreen.to_string(),
 			ConfigSettings::Theme.to_string(),
 			ConfigSettings::EnableKeyboard.to_string(),
+		]
+	}
+
+	pub async fn setting_value(&self, setting: ConfigSettings) -> SettingTypes {
+		let config = self.config.lock().await;
+
+		match setting {
+			ConfigSettings::SwapConfirm => SettingTypes::Boolean(config.swap_confirm),
+			ConfigSettings::StartFullscreen => SettingTypes::Boolean(config.start_fullscreen),
+			ConfigSettings::Theme => SettingTypes::OptionString(config.theme.clone()),
+			ConfigSettings::EnableKeyboard => SettingTypes::Boolean(config.enable_keyboard),
+		}
+	}
+
+	pub fn settings_types(&self) -> Vec<String> {
+		vec![
+			ConfigSettings::SwapConfirm.type_for(),
+			ConfigSettings::StartFullscreen.type_for(),
+			ConfigSettings::Theme.type_for(),
+			ConfigSettings::EnableKeyboard.type_for(),
 		]
 	}
 

@@ -7,6 +7,7 @@ import Popover from "@mui/material/Popover";
 import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
+let CURRENT_MENU_TYPES = {};
 let CURRENT_MENU = [];
 let CURRENT_MENU_INDEX = [];
 let CURRENT_GAMELIST_ASSETS = null;
@@ -145,8 +146,9 @@ function Theme(props) {
       console.log("finding submenu");
       switch (orientation.menu_index) {
         case 0: {
-          console.log("fetching settings submenu");
+          console.log("fetching settings submenu & types");
           invoke("settings_menu").then((x) => (CURRENT_MENU = x));
+          invoke("setting_types").then((x) => (CURRENT_MENU_TYPES = x));
         }
       }
     }

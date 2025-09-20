@@ -1,4 +1,4 @@
-use crate::ConfigSettings;
+use crate::{ConfigSettings, SettingTypes};
 
 use super::{App, Orientation, System};
 use serde::{Deserialize, Serialize};
@@ -6,8 +6,23 @@ use std::path::PathBuf;
 use tauri::State;
 
 #[tauri::command]
-pub fn setting_type(config_setting: ConfigSettings) -> String {
-	config_setting.type_for()
+pub async fn setting_value(
+	state: State<'_, App>, setting: ConfigSettings,
+) -> std::result::Result<String, ()> {
+	tracing::debug!("settings value requested for setting: {}", setting);
+
+	let res = match state.setting_value(setting).await {
+		SettingTypes::Boolean(b) => serde_json::to_string(&b),
+		SettingTypes::OptionString(os) => serde_json::to_string(&os),
+	};
+
+	Ok(res.unwrap())
+}
+
+#[tauri::command]
+pub fn setting_types(state: State<'_, App>) -> Vec<String> {
+	tracing::debug!("settings types requested");
+	state.settings_types()
 }
 
 #[tauri::command]
