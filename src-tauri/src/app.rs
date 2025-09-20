@@ -223,6 +223,7 @@ impl App {
 													"could not write file: {}",
 													self.config_filename.display()
 												));
+
 											std::process::Command::new("reboot")
 												.status()
 												.expect("could not reboot");
@@ -236,6 +237,7 @@ impl App {
 													"could not write file: {}",
 													self.config_filename.display()
 												));
+
 											std::process::Command::new("poweroff")
 												.status()
 												.expect("could not poweroff");

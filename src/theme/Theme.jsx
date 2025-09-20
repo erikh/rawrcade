@@ -8,6 +8,7 @@ import "./Theme.css";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 
 let CURRENT_MENU = [];
+let CURRENT_MENU_INDEX = [];
 let CURRENT_GAMELIST_ASSETS = null;
 
 async function getAsset(t) {
@@ -99,7 +100,38 @@ function Theme(props) {
 
   React.useEffect(() => {
     invoke("menu").then((x) => (CURRENT_MENU = x));
-  }, [orientation && orientation.menu_active]);
+  }, [
+    orientation &&
+      orientation.menu_active &&
+      orientation.menu_index &&
+      !orientation.menu_item_index,
+  ]);
+
+  React.useEffect(() => {
+    if (orientation) {
+      CURRENT_MENU_INDEX = orientation.menu_index;
+    }
+  }, [orientation ? orientation.menu_index : null]);
+
+  React.useEffect(() => {
+    if (orientation) {
+      CURRENT_MENU_INDEX = orientation.menu_item_index;
+    }
+  }, [orientation ? orientation.menu_item_index : null]);
+
+  React.useEffect(() => {
+    if (orientation) {
+      switch (orientation.menu_index) {
+        case 0:
+          invoke("settings_menu").then((x) => (CURRENT_MENU = x));
+      }
+    }
+  }, [
+    orientation &&
+      orientation.menu_active &&
+      orientation.menu_index &&
+      orientation.menu_item_index,
+  ]);
 
   return (
     <React.Fragment>
@@ -166,17 +198,17 @@ function Theme(props) {
       >
         <div className="menu-root">
           {CURRENT_MENU.map((item, i) =>
-            orientation && orientation.menu_index == i ? (
+            CURRENT_MENU_INDEX == i ? (
               <div className="menu-item menu-selected">{item}</div>
-            ) : i == orientation.menu_index - 1 && i == 0 ? (
+            ) : i == CURRENT_MENU_INDEX - 1 && i == 0 ? (
               <div className="menu-item menu-not-selected-previous-first-item">
                 {item}
               </div>
-            ) : i == orientation.menu_index - 1 ? (
+            ) : i == CURRENT_MENU_INDEX - 1 ? (
               <div className="menu-item menu-not-selected-previous-item">
                 {item}
               </div>
-            ) : i == orientation.menu_index + 1 ? (
+            ) : i == CURRENT_MENU_INDEX + 1 ? (
               <div className="menu-item menu-not-selected-next-item">
                 {item}
               </div>
