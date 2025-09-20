@@ -14,14 +14,14 @@ pub enum LogLevel {
 	Error,
 }
 
-impl Into<tracing::Level> for LogLevel {
-	fn into(self) -> tracing::Level {
-		match self {
-			Self::Trace => tracing::Level::TRACE,
-			Self::Debug => tracing::Level::DEBUG,
-			Self::Info => tracing::Level::INFO,
-			Self::Warn => tracing::Level::WARN,
-			Self::Error => tracing::Level::ERROR,
+impl From<LogLevel> for tracing::Level {
+	fn from(value: LogLevel) -> tracing::Level {
+		match value {
+			LogLevel::Trace => tracing::Level::TRACE,
+			LogLevel::Debug => tracing::Level::DEBUG,
+			LogLevel::Info => tracing::Level::INFO,
+			LogLevel::Warn => tracing::Level::WARN,
+			LogLevel::Error => tracing::Level::ERROR,
 		}
 	}
 }
@@ -62,6 +62,7 @@ impl Config {
 		let f = std::fs::OpenOptions::new()
 			.create(true)
 			.write(true)
+			.truncate(true)
 			.open(filename)?;
 		Ok(serde_json::to_writer_pretty(&f, self)?)
 	}

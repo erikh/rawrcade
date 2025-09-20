@@ -47,15 +47,14 @@ impl From<usize> for ConfigSettings {
 	}
 }
 
-impl ToString for ConfigSettings {
-	fn to_string(&self) -> String {
-		match self {
+impl std::fmt::Display for ConfigSettings {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.write_str(match self {
 			ConfigSettings::SwapConfirm => "Japanese-style Input",
 			ConfigSettings::StartFullscreen => "Start in Fullscreen",
 			ConfigSettings::Theme => "Set Theme",
 			ConfigSettings::EnableKeyboard => "Enable Keyboard",
-		}
-		.to_string()
+		})
 	}
 }
 
@@ -82,17 +81,16 @@ impl From<usize> for MenuItems {
 	}
 }
 
-impl ToString for MenuItems {
-	fn to_string(&self) -> String {
-		match self {
+impl std::fmt::Display for MenuItems {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.write_str(match self {
 			MenuItems::Settings => "Settings",
 			MenuItems::Themes => "Themes",
 			MenuItems::Fullscreen => "Toggle Fullscreen Window",
 			MenuItems::Exit => "Exit RAWRcade",
 			MenuItems::Reboot => "Reboot System",
 			MenuItems::Shutdown => "Shutdown System",
-		}
-		.to_string()
+		})
 	}
 }
 
@@ -183,7 +181,7 @@ impl App {
 							let mut orientation = self.orientation.lock().await;
 
 							if orientation.menu_active {
-								if let Some(_) = orientation.menu_item_index {
+								if orientation.menu_item_index.is_some() {
 									orientation.menu_item_index = None;
 								} else {
 									orientation.menu_active = false;
@@ -226,10 +224,12 @@ impl App {
 												.lock()
 												.await
 												.to_file(&self.config_filename)
-												.expect(&format!(
-													"could not write file: {}",
-													self.config_filename.display()
-												));
+												.unwrap_or_else(|_| {
+													panic!(
+														"could not write file: {}",
+														self.config_filename.display()
+													)
+												});
 
 											std::process::Command::new("reboot")
 												.status()
@@ -240,10 +240,12 @@ impl App {
 												.lock()
 												.await
 												.to_file(&self.config_filename)
-												.expect(&format!(
-													"could not write file: {}",
-													self.config_filename.display()
-												));
+												.unwrap_or_else(|_| {
+													panic!(
+														"could not write file: {}",
+														self.config_filename.display()
+													)
+												});
 
 											std::process::Command::new("poweroff")
 												.status()
@@ -268,10 +270,12 @@ impl App {
 												.lock()
 												.await
 												.to_file(&self.config_filename)
-												.expect(&format!(
-													"could not write file: {}",
-													self.config_filename.display()
-												));
+												.unwrap_or_else(|_| {
+													panic!(
+														"could not write file: {}",
+														self.config_filename.display()
+													)
+												});
 
 											std::process::exit(0);
 										}
@@ -377,12 +381,10 @@ impl App {
 										} else {
 											lock.menu_item_index = Some(inner_idx - 1);
 										}
+									} else if index == 0 {
+										lock.menu_index = Some(len);
 									} else {
-										if index == 0 {
-											lock.menu_index = Some(len);
-										} else {
-											lock.menu_index = Some(index - 1);
-										}
+										lock.menu_index = Some(index - 1);
 									}
 								} else {
 									lock.menu_index = Some(0)
@@ -411,12 +413,10 @@ impl App {
 										} else {
 											lock.menu_item_index = Some(inner_idx + 1);
 										}
+									} else if index == len {
+										lock.menu_index = Some(0);
 									} else {
-										if index == len {
-											lock.menu_index = Some(0);
-										} else {
-											lock.menu_index = Some(index + 1);
-										}
+										lock.menu_index = Some(index + 1);
 									}
 								} else {
 									lock.menu_index = Some(0)
