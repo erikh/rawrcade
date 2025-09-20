@@ -1,4 +1,7 @@
-use crate::{APP_HANDLE, Config, Game, GameList, SystemList};
+use crate::{
+	APP_HANDLE, Config, DEFAULT_CONFIG_FILENAME, Game, GameList,
+	SystemList,
+};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -59,6 +62,7 @@ pub struct App {
 	pub orientation: Arc<Mutex<Orientation>>,
 	pub input_send: Sender<InputEvent>,
 
+	config_filename: PathBuf,
 	input_recv: Arc<Mutex<Receiver<InputEvent>>>,
 	ignore_events: Arc<AtomicBool>,
 }
@@ -81,7 +85,11 @@ impl Default for App {
 
 		let (s, r) = channel(1000);
 
+		let path = dirs::config_dir()
+			.unwrap_or(dirs::home_dir().unwrap_or("/".into()));
+
 		Self {
+			config_filename: path.join(DEFAULT_CONFIG_FILENAME),
 			config: Config::default(),
 			input_send: s,
 			input_recv: Arc::new(Mutex::new(r)),
@@ -93,9 +101,11 @@ impl Default for App {
 }
 
 impl App {
-	pub fn new(config_filename: &PathBuf) -> Result<Self> {
+	pub fn new(config_filename: Option<&PathBuf>) -> Result<Self> {
 		let mut this = Self::default();
-		if let Ok(config) = Config::from_file(config_filename) {
+		if let Ok(config) = Config::from_file(
+			config_filename.unwrap_or(&this.config_filename),
+		) {
 			this.config = config
 		}
 
@@ -183,7 +193,16 @@ impl App {
 											}
 										}
 										MenuItems::Exit => {
-											std::process::exit(0)
+											self.config
+												.to_file(
+													&self
+														.config_filename,
+												)
+												.expect(
+													&format!("could not write file: {}", self.config_filename.display()),
+												);
+
+											std::process::exit(0);
 										}
 										_ => {}
 									}

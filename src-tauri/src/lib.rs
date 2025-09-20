@@ -109,11 +109,8 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-	let path = dirs::config_dir()
-		.unwrap_or(dirs::home_dir().unwrap_or("/".into()));
-
-	let appdata = App::new(&path.join(DEFAULT_CONFIG_FILENAME))
-		.expect("could not initialize application");
+	let appdata =
+		App::new(None).expect("could not initialize application");
 	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()

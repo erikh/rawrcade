@@ -32,6 +32,10 @@ impl Config {
 	}
 
 	pub fn to_file(&self, filename: &PathBuf) -> Result<()> {
+		if let Some(parent) = filename.parent() {
+			std::fs::create_dir_all(parent)?;
+		}
+
 		let f = std::fs::OpenOptions::new()
 			.create(true)
 			.write(true)
