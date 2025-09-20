@@ -1,7 +1,4 @@
-use crate::{
-	APP_HANDLE, Config, DEFAULT_CONFIG_FILENAME, Game, GameList,
-	SystemList,
-};
+use crate::{APP_HANDLE, Config, DEFAULT_CONFIG_FILENAME, Game, GameList, SystemList};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -69,8 +66,7 @@ pub struct App {
 
 impl Default for App {
 	fn default() -> Self {
-		let mut all_systems =
-			SystemList::from_file("test-systems.xml".into()).unwrap();
+		let mut all_systems = SystemList::from_file("test-systems.xml".into()).unwrap();
 
 		let gamelist = GameList::from_file("test-gamelist.xml".into())
 			.unwrap()
@@ -85,8 +81,7 @@ impl Default for App {
 
 		let (s, r) = channel(1000);
 
-		let path = dirs::config_dir()
-			.unwrap_or(dirs::home_dir().unwrap_or("/".into()));
+		let path = dirs::config_dir().unwrap_or(dirs::home_dir().unwrap_or("/".into()));
 
 		Self {
 			config_filename: path.join(DEFAULT_CONFIG_FILENAME),
@@ -103,9 +98,7 @@ impl Default for App {
 impl App {
 	pub fn new(config_filename: Option<&PathBuf>) -> Result<Self> {
 		let mut this = Self::default();
-		if let Ok(config) = Config::from_file(
-			config_filename.unwrap_or(&this.config_filename),
-		) {
+		if let Ok(config) = Config::from_file(config_filename.unwrap_or(&this.config_filename)) {
 			this.config = config
 		}
 
@@ -134,8 +127,7 @@ impl App {
 					tracing::debug!("input event: {:?}", e);
 					match e {
 						InputEvent::Cancel => {
-							let mut orientation =
-								self.orientation.lock().await;
+							let mut orientation = self.orientation.lock().await;
 
 							if orientation.menu_active {
 								orientation.menu_active = false;
@@ -144,63 +136,42 @@ impl App {
 							}
 						}
 						InputEvent::Ok => {
-							let orientation =
-								self.orientation.lock().await;
+							let orientation = self.orientation.lock().await;
 
 							if orientation.menu_active {
-								if let Some(idx) =
-									orientation.menu_index
-								{
+								if let Some(idx) = orientation.menu_index {
 									match MenuItems::from(idx) {
 										MenuItems::Reboot => {
-											std::process::Command::new(
-												"reboot",
-											)
-											.status()
-											.expect("could not reboot");
+											std::process::Command::new("reboot")
+												.status()
+												.expect("could not reboot");
 										}
 										MenuItems::Shutdown => {
-											std::process::Command::new(
-												"poweroff",
-											)
-											.status()
-											.expect(
-												"could not poweroff",
-											);
+											std::process::Command::new("poweroff")
+												.status()
+												.expect("could not poweroff");
 										}
 										MenuItems::Fullscreen => {
-											if let Some(app_handle) =
-												APP_HANDLE.get()
-											{
-												if let Some(window) =
-													app_handle
-														.get_window(
-															"main",
-														) {
+											if let Some(app_handle) = APP_HANDLE.get() {
+												if let Some(window) = app_handle.get_window("main")
+												{
 													window
 														.set_fullscreen(
-															!window
-																.is_fullscreen(
-																)
-																.expect(
-																	"could not toggle fullscreen",
-																),
+															!window.is_fullscreen().expect(
+																"could not toggle fullscreen",
+															),
 														)
-														.expect(
-															"Could not unset fullscreen state",
-														);
+														.expect("Could not unset fullscreen state");
 												}
 											}
 										}
 										MenuItems::Exit => {
-											self.config
-												.to_file(
-													&self
-														.config_filename,
-												)
-												.expect(
-													&format!("could not write file: {}", self.config_filename.display()),
-												);
+											self.config.to_file(&self.config_filename).expect(
+												&format!(
+													"could not write file: {}",
+													self.config_filename.display()
+												),
+											);
 
 											std::process::exit(0);
 										}
@@ -208,96 +179,59 @@ impl App {
 									}
 								}
 							} else {
-								let system = &self
-									.all_systems
-									.lock()
-									.await
-									.system[orientation.system_index];
+								let system =
+									&self.all_systems.lock().await.system[orientation.system_index];
 
 								let mut is_fullscreen = false;
 
-								if let Some(app_handle) =
-									APP_HANDLE.get()
-								{
-									if let Some(window) =
-										app_handle.get_window("main")
-									{
+								if let Some(app_handle) = APP_HANDLE.get() {
+									if let Some(window) = app_handle.get_window("main") {
 										is_fullscreen = window
 											.is_fullscreen()
-											.expect(
-												"could not get fullscreen state",
-											);
+											.expect("could not get fullscreen state");
 
 										if is_fullscreen {
 											window
 												.set_fullscreen(false)
-												.expect(
-													"Could not unset fullscreen state",
-												);
+												.expect("Could not unset fullscreen state");
 										}
 									}
 								}
 
-								self.ignore_events
-									.store(true, Ordering::SeqCst);
+								self.ignore_events.store(true, Ordering::SeqCst);
 
-								let game = system.gamelist
-									[orientation.gamelist_index]
-									.clone();
+								let game = system.gamelist[orientation.gamelist_index].clone();
 
 								let command = system.get_command(
-									game.path.expect(
-										"Need a path to the rom in gamelist.xml",
-									),
+									game.path.expect("Need a path to the rom in gamelist.xml"),
 								);
 
 								let args = vec!["-c", &command];
-								let mut child =
-									std::process::Command::new(
-										"/bin/sh",
-									)
+								let mut child = std::process::Command::new("/bin/sh")
 									.args(args)
 									.spawn()
 									// FIXME: probably should do something better here
-									.expect(
-										"Could not boot emulator command",
-									);
+									.expect("Could not boot emulator command");
 
 								let s = self.clone();
 
-								tauri::async_runtime::spawn(
-									async move {
-										let _ = child.wait();
-										s.ignore_events.store(
-											false,
-											Ordering::SeqCst,
-										);
+								tauri::async_runtime::spawn(async move {
+									let _ = child.wait();
+									s.ignore_events.store(false, Ordering::SeqCst);
 
-										if let Some(app_handle) =
-											APP_HANDLE.get()
-										{
-											if let Some(window) =
-												app_handle
-													.get_window("main")
-											{
-												window
-													.set_fullscreen(
-														is_fullscreen,
-													)
-													.expect(
-														"Could not set fullscreen state",
-													);
-											}
+									if let Some(app_handle) = APP_HANDLE.get() {
+										if let Some(window) = app_handle.get_window("main") {
+											window
+												.set_fullscreen(is_fullscreen)
+												.expect("Could not set fullscreen state");
 										}
-									},
-								);
+									}
+								});
 							}
 						}
 						InputEvent::Menu => {
-							let mut orientation =
-								self.orientation.lock().await;
-							orientation.menu_active =
-								!orientation.menu_active;
+							let mut orientation = self.orientation.lock().await;
+							orientation.menu_active = !orientation.menu_active;
 							if orientation.menu_active {
 								orientation.menu_index = Some(0);
 							} else {
@@ -306,15 +240,9 @@ impl App {
 							}
 						}
 						InputEvent::Right => {
-							let mut lock =
-								self.orientation.lock().await;
+							let mut lock = self.orientation.lock().await;
 							if !lock.menu_active {
-								let len = self
-									.all_systems
-									.lock()
-									.await
-									.system
-									.len() - 1;
+								let len = self.all_systems.lock().await.system.len() - 1;
 								if lock.system_index >= len {
 									lock.system_index = 0;
 								} else {
@@ -325,15 +253,9 @@ impl App {
 							}
 						}
 						InputEvent::Left => {
-							let mut lock =
-								self.orientation.lock().await;
+							let mut lock = self.orientation.lock().await;
 							if !lock.menu_active {
-								let len = self
-									.all_systems
-									.lock()
-									.await
-									.system
-									.len() - 1;
+								let len = self.all_systems.lock().await.system.len() - 1;
 								if lock.system_index == 0 {
 									lock.system_index = len;
 								} else {
@@ -344,26 +266,20 @@ impl App {
 							}
 						}
 						InputEvent::Up => {
-							let mut lock =
-								self.orientation.lock().await;
+							let mut lock = self.orientation.lock().await;
 							if lock.menu_active {
 								let len = self.menu().len() - 1;
 								if let Some(index) = lock.menu_index {
 									if index == 0 {
 										lock.menu_index = Some(len);
 									} else {
-										lock.menu_index =
-											Some(index - 1);
+										lock.menu_index = Some(index - 1);
 									}
 								} else {
 									lock.menu_index = Some(0)
 								}
 							} else {
-								let len = self
-									.all_systems
-									.lock()
-									.await
-									.system[lock.system_index]
+								let len = self.all_systems.lock().await.system[lock.system_index]
 									.gamelist
 									.len() - 1;
 
@@ -375,8 +291,7 @@ impl App {
 							}
 						}
 						InputEvent::Down => {
-							let mut lock =
-								self.orientation.lock().await;
+							let mut lock = self.orientation.lock().await;
 							if lock.menu_active {
 								let len = self.menu().len() - 1;
 
@@ -384,18 +299,13 @@ impl App {
 									if index == len {
 										lock.menu_index = Some(0);
 									} else {
-										lock.menu_index =
-											Some(index + 1);
+										lock.menu_index = Some(index + 1);
 									}
 								} else {
 									lock.menu_index = Some(0)
 								}
 							} else {
-								let len = self
-									.all_systems
-									.lock()
-									.await
-									.system[lock.system_index]
+								let len = self.all_systems.lock().await.system[lock.system_index]
 									.gamelist
 									.len() - 1;
 
