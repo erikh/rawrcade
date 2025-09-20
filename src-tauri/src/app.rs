@@ -98,7 +98,7 @@ impl ToString for MenuItems {
 
 #[derive(Debug, Clone)]
 pub struct App {
-	pub config: Config,
+	pub config: Arc<Mutex<Config>>,
 	pub all_systems: Arc<Mutex<SystemList>>,
 	pub orientation: Arc<Mutex<Orientation>>,
 	pub input_send: Sender<InputEvent>,
@@ -129,7 +129,7 @@ impl Default for App {
 
 		Self {
 			config_filename: path.join(DEFAULT_CONFIG_FILENAME),
-			config: Config::default(),
+			config: Arc::new(Mutex::new(Config::default())),
 			input_send: s,
 			input_recv: Arc::new(Mutex::new(r)),
 			all_systems: Arc::new(Mutex::new(all_systems)),
@@ -143,7 +143,7 @@ impl App {
 	pub fn new(config_filename: Option<&PathBuf>) -> Result<Self> {
 		let mut this = Self::default();
 		if let Ok(config) = Config::from_file(config_filename.unwrap_or(&this.config_filename)) {
-			this.config = config
+			this.config = Arc::new(Mutex::new(config))
 		}
 
 		Ok(this)
@@ -189,17 +189,53 @@ impl App {
 							}
 						}
 						InputEvent::Ok => {
-							let orientation = self.orientation.lock().await;
+							let mut orientation = self.orientation.lock().await;
 
 							if orientation.menu_active {
 								if let Some(idx) = orientation.menu_index {
 									match MenuItems::from(idx) {
+										MenuItems::Settings => match orientation.menu_item_index {
+											Some(inner_idx) => {
+												let mut config = self.config.lock().await;
+												match ConfigSettings::from(inner_idx) {
+													ConfigSettings::Theme => {}
+													ConfigSettings::EnableKeyboard => {
+														config.enable_keyboard =
+															!config.enable_keyboard
+													}
+													ConfigSettings::StartFullscreen => {
+														config.start_fullscreen =
+															!config.start_fullscreen
+													}
+													ConfigSettings::SwapConfirm => {
+														config.swap_confirm = !config.swap_confirm
+													}
+												}
+											}
+											None => orientation.menu_item_index = Some(0),
+										},
 										MenuItems::Reboot => {
+											self.config
+												.lock()
+												.await
+												.to_file(&self.config_filename)
+												.expect(&format!(
+													"could not write file: {}",
+													self.config_filename.display()
+												));
 											std::process::Command::new("reboot")
 												.status()
 												.expect("could not reboot");
 										}
 										MenuItems::Shutdown => {
+											self.config
+												.lock()
+												.await
+												.to_file(&self.config_filename)
+												.expect(&format!(
+													"could not write file: {}",
+													self.config_filename.display()
+												));
 											std::process::Command::new("poweroff")
 												.status()
 												.expect("could not poweroff");
@@ -219,12 +255,14 @@ impl App {
 											}
 										}
 										MenuItems::Exit => {
-											self.config.to_file(&self.config_filename).expect(
-												&format!(
+											self.config
+												.lock()
+												.await
+												.to_file(&self.config_filename)
+												.expect(&format!(
 													"could not write file: {}",
 													self.config_filename.display()
-												),
-											);
+												));
 
 											std::process::exit(0);
 										}

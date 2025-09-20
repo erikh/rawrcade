@@ -100,13 +100,13 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
+pub async fn run() {
 	let appdata = App::new(None).expect("could not initialize application");
 	let inner = appdata.clone();
 
 	tracing_subscriber::fmt()
 		.with_max_level(Into::<tracing::Level>::into(
-			appdata.config.log_level.clone(),
+			appdata.config.lock().await.log_level.clone(),
 		))
 		.init();
 
