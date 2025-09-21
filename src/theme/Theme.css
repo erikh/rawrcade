@@ -90,6 +90,9 @@ body {
 }
 
 .menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1em;
   color: white;
   border: none;
@@ -98,6 +101,7 @@ body {
 }
 
 .menu-selected {
+  display: flex;
   border: 1px solid black;
   background-color: #384862;
   box-shadow: inset -2px -2px 30px #666;
@@ -105,6 +109,7 @@ body {
 
 /* I hate CSS */
 .menu-not-selected-first-item {
+  display: flex;
   background-color: #999;
   border-top: 1px solid black;
   border-left: 1px solid black;
@@ -113,6 +118,7 @@ body {
 }
 
 .menu-not-selected-previous-first-item {
+  display: flex;
   background-color: #999;
   border-top: 1px solid black;
   border-left: 1px solid black;
@@ -121,6 +127,7 @@ body {
 }
 
 .menu-not-selected-previous-item {
+  display: flex;
   background-color: #999;
   border-bottom: none;
   border-left: 1px solid black;
@@ -129,6 +136,7 @@ body {
 }
 
 .menu-not-selected-next-item {
+  display: flex;
   background-color: #999;
   border-top: none;
   border-left: 1px solid black;
@@ -137,6 +145,7 @@ body {
 }
 
 .menu-not-selected {
+  display: flex;
   background-color: #999;
   border-top: none;
   border-left: 1px solid black;
@@ -153,5 +162,4 @@ body {
   padding-right: 2.5vw;
   width: 65vw;
   height: 50vh;
-  overflow-y: scroll;
 }
