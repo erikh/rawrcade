@@ -148,7 +148,7 @@ pub async fn run() {
 			menu,
 			setting_types,
 			settings_menu,
-			setting_value,
+			setting_values,
 		])
 		.build(context)
 		.unwrap();

@@ -206,14 +206,14 @@ function Theme(props) {
                 });
               });
 
-              interval = setInterval(() => {
-                CURRENT_MENU_VALUES = [];
+              invoke("setting_values").then(
+                (value) => (CURRENT_MENU_VALUES = value)
+              );
 
-                CURRENT_MENU.forEach((_, x) => {
-                  invoke("setting_value", { setting: x }).then((value) => {
-                    CURRENT_MENU_VALUES[x] = value;
-                  });
-                });
+              interval = setInterval(() => {
+                invoke("setting_values").then(
+                  (value) => (CURRENT_MENU_VALUES = value)
+                );
               }, 200);
 
               console.log(CURRENT_MENU_VALUES);

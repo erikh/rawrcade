@@ -23,12 +23,6 @@ pub enum ConfigSettings {
 	EnableKeyboard,
 }
 
-#[derive(Debug, Clone)]
-pub enum SettingTypes {
-	Boolean(bool),
-	OptionString(Option<String>),
-}
-
 impl ConfigSettings {
 	pub fn type_for(&self) -> String {
 		match self {
@@ -169,21 +163,14 @@ impl App {
 		]
 	}
 
-	pub async fn setting_value(&self, setting: usize) -> Option<SettingTypes> {
-		let settings = self.settings_menu();
-
+	pub async fn setting_values(&self) -> Vec<String> {
 		let config = self.config.lock().await;
-
-		if let Some(config_setting) = settings.get(setting) {
-			Some(match config_setting {
-				ConfigSettings::SwapConfirm => SettingTypes::Boolean(config.swap_confirm),
-				ConfigSettings::StartFullscreen => SettingTypes::Boolean(config.start_fullscreen),
-				ConfigSettings::Theme => SettingTypes::OptionString(config.theme.clone()),
-				ConfigSettings::EnableKeyboard => SettingTypes::Boolean(config.enable_keyboard),
-			})
-		} else {
-			None
-		}
+		vec![
+			serde_json::to_string(&config.swap_confirm).unwrap(),
+			serde_json::to_string(&config.start_fullscreen).unwrap(),
+			serde_json::to_string(&config.theme).unwrap(),
+			serde_json::to_string(&config.enable_keyboard).unwrap(),
+		]
 	}
 
 	pub fn settings_types(&self) -> Vec<String> {

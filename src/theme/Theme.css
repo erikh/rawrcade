@@ -84,8 +84,7 @@ body {
 .menu-popover {
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20vh;
-  margin-bottom: 10vh;
+  margin-top: 20vw;
   width: 80vw;
 }
 
