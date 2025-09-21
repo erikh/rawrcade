@@ -86,6 +86,8 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 						Button::Start => Some(InputEvent::Menu),
 						Button::South => Some(InputEvent::Ok),
 						Button::East => Some(InputEvent::Cancel),
+						Button::LeftTrigger => Some(InputEvent::PageUp),
+						Button::RightTrigger => Some(InputEvent::PageDown),
 						_ => None,
 					};
 

@@ -447,6 +447,37 @@ impl App {
 								}
 							}
 						}
+						InputEvent::PageUp => {
+							let mut lock = self.orientation.lock().await;
+							if !lock.menu_active {
+								let len = self.all_systems.lock().await.system[lock.system_index]
+									.gamelist
+									.len() - 1;
+								let mut val = lock.gamelist_index as isize - 10;
+
+								while val < 0 {
+									val = len as isize + val
+								}
+
+								lock.gamelist_index = val as usize;
+							}
+						}
+						InputEvent::PageDown => {
+							let mut lock = self.orientation.lock().await;
+							if !lock.menu_active {
+								let len = self.all_systems.lock().await.system[lock.system_index]
+									.gamelist
+									.len() - 1;
+
+								let mut res = lock.gamelist_index + 10;
+
+								while res >= len {
+									res = res - len;
+								}
+
+								lock.gamelist_index = res;
+							}
+						}
 						_ => {}
 					}
 				}
