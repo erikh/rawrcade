@@ -79,17 +79,19 @@ async fn handle_gamepad_input(sender: Sender<InputEvent>) {
 				}
 				GamepadEventType::ButtonPressed(x, ..) => {
 					let event = match x {
-						Button::DPadDown => InputEvent::Down,
-						Button::DPadUp => InputEvent::Up,
-						Button::DPadLeft => InputEvent::Left,
-						Button::DPadRight => InputEvent::Right,
-						Button::Start => InputEvent::Menu,
-						Button::South => InputEvent::Ok,
-						Button::East => InputEvent::Cancel,
-						_ => InputEvent::Down,
+						Button::DPadDown => Some(InputEvent::Down),
+						Button::DPadUp => Some(InputEvent::Up),
+						Button::DPadLeft => Some(InputEvent::Left),
+						Button::DPadRight => Some(InputEvent::Right),
+						Button::Start => Some(InputEvent::Menu),
+						Button::South => Some(InputEvent::Ok),
+						Button::East => Some(InputEvent::Cancel),
+						_ => None,
 					};
 
-					let _ = sender.send(event).await;
+					if let Some(event) = event {
+						let _ = sender.send(event).await;
+					}
 				}
 				_ => {}
 			}

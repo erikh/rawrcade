@@ -2,5 +2,4 @@
 - Themes
 - Japanese Input
 - Clean up debouncing
-- Support/Mute rest of controller
 - Refactor app code / event loop
