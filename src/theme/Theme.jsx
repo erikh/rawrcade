@@ -50,7 +50,7 @@ function pickSelector(i, item) {
         );
     }
   } else {
-    return <React.Fragment>{item}</React.Fragment>;
+    return item;
   }
 }
 
