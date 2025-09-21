@@ -14,33 +14,43 @@ let CURRENT_MENU = [];
 let CURRENT_MENU_INDEX = [];
 let CURRENT_GAMELIST_ASSETS = null;
 
-function pickSelector(i) {
-  switch (CURRENT_MENU_TYPES[i]) {
-    case "boolean":
-      return (
-        <Switch
-          checked={JSON.parse(CURRENT_MENU_VALUES[i])}
-          sx={{
-            display: "flex",
-            marginLeft: "auto",
-            justifyContent: "flex-end",
-          }}
-        >
-          {CURRENT_MENU_VALUES[i]}
-        </Switch>
-      );
-    case "string":
-      return (
-        <div
-          style={{
-            display: "flex",
-            marginLeft: "auto",
-            justifyContent: "flex-end",
-          }}
-        >
-          {JSON.parse(CURRENT_MENU_VALUES[i]) || "<None>"}
-        </div>
-      );
+function pickSelector(i, item) {
+  if (CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i]) {
+    switch (CURRENT_MENU_TYPES[i]) {
+      case "boolean":
+        return (
+          <React.Fragment>
+            <div>{item}</div>
+            <Switch
+              checked={JSON.parse(CURRENT_MENU_VALUES[i])}
+              sx={{
+                display: "flex",
+                marginLeft: "auto",
+                justifyContent: "flex-end",
+              }}
+            >
+              {CURRENT_MENU_VALUES[i]}
+            </Switch>
+          </React.Fragment>
+        );
+      case "string":
+        return (
+          <React.Fragment>
+            <div>{item}</div>
+            <div
+              style={{
+                display: "flex",
+                marginLeft: "auto",
+                justifyContent: "flex-end",
+              }}
+            >
+              {JSON.parse(CURRENT_MENU_VALUES[i]) || "<None>"}
+            </div>
+          </React.Fragment>
+        );
+    }
+  } else {
+    return <React.Fragment>{item}</React.Fragment>;
   }
 }
 
@@ -289,69 +299,27 @@ function Theme(props) {
           {CURRENT_MENU.map((item, i) =>
             CURRENT_MENU_INDEX == i ? (
               <div className="menu-item menu-selected">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             ) : i == CURRENT_MENU_INDEX - 1 && i == 0 ? (
               <div className="menu-item menu-not-selected-previous-first-item">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             ) : i == CURRENT_MENU_INDEX - 1 ? (
               <div className="menu-item menu-not-selected-previous-item">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             ) : i == CURRENT_MENU_INDEX + 1 ? (
               <div className="menu-item menu-not-selected-next-item">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             ) : i == 0 ? (
               <div className="menu-item menu-not-selected-first-item">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             ) : (
               <div className="menu-item menu-not-selected">
-                {CURRENT_MENU_TYPES[i] && CURRENT_MENU_VALUES[i] ? (
-                  <React.Fragment>
-                    <div>{item}</div>
-                    {pickSelector(i)}
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>{item}</React.Fragment>
-                )}
+                {pickSelector(i, item)}
               </div>
             )
           )}
