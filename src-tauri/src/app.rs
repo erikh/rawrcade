@@ -66,7 +66,6 @@ impl std::fmt::Display for ConfigSettings {
 
 enum MenuItems {
 	Settings,
-	Themes,
 	Fullscreen,
 	Exit,
 	Reboot,
@@ -77,11 +76,10 @@ impl From<usize> for MenuItems {
 	fn from(value: usize) -> Self {
 		match value {
 			0 => Self::Settings,
-			1 => Self::Themes,
-			2 => Self::Fullscreen,
-			3 => Self::Exit,
-			4 => Self::Reboot,
-			5 => Self::Shutdown,
+			1 => Self::Fullscreen,
+			2 => Self::Exit,
+			3 => Self::Reboot,
+			4 => Self::Shutdown,
 			_ => panic!("Invalid menu item"),
 		}
 	}
@@ -91,7 +89,6 @@ impl std::fmt::Display for MenuItems {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		f.write_str(match self {
 			MenuItems::Settings => "Settings",
-			MenuItems::Themes => "Themes",
 			MenuItems::Fullscreen => "Toggle Fullscreen Window",
 			MenuItems::Exit => "Exit RAWRcade",
 			MenuItems::Reboot => "Reboot System",
@@ -156,7 +153,6 @@ impl App {
 	pub fn menu(&self) -> Vec<String> {
 		vec![
 			MenuItems::Settings.to_string(),
-			MenuItems::Themes.to_string(),
 			MenuItems::Fullscreen.to_string(),
 			MenuItems::Exit.to_string(),
 			MenuItems::Reboot.to_string(),
@@ -311,7 +307,6 @@ impl App {
 
 											std::process::exit(0);
 										}
-										_ => {}
 									}
 								}
 							} else {
