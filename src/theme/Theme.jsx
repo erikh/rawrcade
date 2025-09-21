@@ -339,7 +339,7 @@ function Theme(props) {
                     {pickSelector(i)}
                   </React.Fragment>
                 ) : (
-                  <React.Fragment />
+                  <React.Fragment>{item}</React.Fragment>
                 )}
               </div>
             ) : (
