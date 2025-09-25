@@ -1,18 +1,18 @@
-use crate::{APP_HANDLE, Config, DEFAULT_CONFIG_FILENAME, Game, GameList, SystemList};
+use crate::{Config, Game, GameList, SystemList, APP_HANDLE, DEFAULT_CONFIG_FILENAME};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{
 	path::PathBuf,
 	sync::{
-		Arc,
 		atomic::{AtomicBool, Ordering},
+		Arc,
 	},
 	time::Duration,
 };
 use tauri::Manager;
 use tokio::sync::{
+	mpsc::{channel, Receiver, Sender},
 	Mutex,
-	mpsc::{Receiver, Sender, channel},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -174,7 +174,6 @@ impl App {
 
 									if let Some(system) = system {
 										system.gamelist = gamelist;
-										eprintln!("{} {:?}", name, system);
 									}
 								}
 							}
