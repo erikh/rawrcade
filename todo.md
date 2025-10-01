@@ -1,5 +1,3 @@
 - Keyboard Support
 - Themes
 - Japanese Input
-- Clean up debouncing
-- Refactor app code / event loop
