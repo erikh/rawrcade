@@ -394,12 +394,18 @@ impl App {
 	}
 
 	pub async fn event_loop(&self) {
-		while let Ok(event) = self.next_event().await {
+		loop {
+			let event = self.next_event().await;
+
+			if event.is_none() {
+				continue;
+			}
+
 			if self.ignore_events.load(Ordering::SeqCst) {
 				continue;
 			}
 
-			match event.typ {
+			match event.unwrap().typ {
 				EventType::Input(e) => {
 					tracing::debug!("input event: {:?}", e);
 					match e {
@@ -419,20 +425,17 @@ impl App {
 		}
 	}
 
-	pub async fn next_event(&self) -> Result<Event> {
-		loop {
-			let mut chan = self.input_recv.lock().await;
-			let item = chan.try_recv();
-			if let Ok(item) = item {
-				tracing::debug!("received event {:?}", item);
+	pub async fn next_event(&self) -> Option<Event> {
+		let mut chan = self.input_recv.lock().await;
+		if let Ok(item) = chan.try_recv() {
+			tracing::debug!("received event {:?}", item);
 
-				return Ok(Event {
-					typ: EventType::Input(item),
-				});
-			} else {
-				tokio::time::sleep(Duration::from_millis(50)).await;
-				continue;
-			}
+			Some(Event {
+				typ: EventType::Input(item),
+			})
+		} else {
+			tokio::time::sleep(Duration::from_millis(50)).await;
+			None
 		}
 	}
 }
