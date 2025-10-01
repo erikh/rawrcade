@@ -19,13 +19,19 @@ function App() {
   }
 
   useEffect(() => {
-    getSystems();
-  }, [orientation ? orientation.system_index : 0]);
+    const effect = async () => {
+      await getSystems();
+    };
+    effect();
+  }, []);
 
   useEffect(() => {
-    getOrientation();
-    const id = setInterval(() => getOrientation(), 50);
-    return () => clearInterval(id);
+    const effect = async () => {
+      await getOrientation();
+      const id = setInterval(async () => await getOrientation(), 50);
+      return () => clearInterval(id);
+    };
+    effect();
   }, []);
 
   return <Theme systems={systems} orientation={orientation} />;

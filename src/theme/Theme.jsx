@@ -72,28 +72,20 @@ function NoGameList() {
   return <div>No Game List Provided</div>;
 }
 
-function populateGameListAssets(current) {
-  let res = getAsset("image").then((filename) => {
-    if (filename) {
-      return (
-        <div>
-          <img class="game-image" src={convertFileSrc(filename)} />
-        </div>
-      );
-    } else {
-      return null;
-    }
-  });
+async function populateGameListAssets(current) {
+  const filename = await getAsset("image");
 
-  let image = <div> </div>;
-
-  if (res) {
-    image = res;
-  }
-
-  let description = getText("description").then((desc) =>
-    desc ? <div>{desc}</div> : <div> </div>
+  const image = filename ? (
+    <div>
+      <img class="game-image" src={convertFileSrc(filename)} />
+    </div>
+  ) : (
+    <div> </div>
   );
+
+  const desc = await getText("description");
+
+  let description = desc ? <div>{desc}</div> : <div> </div>;
 
   CURRENT_GAMELIST_ASSETS = {
     index: current,
@@ -107,7 +99,10 @@ function GameList(props) {
   const current = props.current;
 
   React.useEffect(() => {
-    populateGameListAssets(current || 0);
+    const effect = async () => {
+      await populateGameListAssets(current || 0);
+    };
+    effect();
   }, [current]);
 
   if (!list || list.length == 0) {
@@ -142,14 +137,16 @@ function Theme(props) {
       : {};
 
   React.useEffect(() => {
-    if (orientation && orientation.menu_item_index === null) {
-      console.log("fetching menu");
-      invoke("menu").then((x) => {
-        CURRENT_MENU = x;
+    const effect = async () => {
+      if (orientation && orientation.menu_item_index === null) {
+        console.log("fetching menu");
+        const menu = await invoke("menu");
+        CURRENT_MENU = menu;
         CURRENT_MENU_VALUES = [];
         CURRENT_MENU_TYPES = [];
-      });
-    }
+      }
+    };
+    effect();
   }, [
     orientation && orientation.menu_item_index === null
       ? orientation.menu_active
@@ -187,45 +184,36 @@ function Theme(props) {
   ]);
 
   React.useEffect(() => {
-    console.log("submenu trigger");
-    let interval = null;
-    if (orientation && orientation.menu_item_index !== null) {
-      console.log("finding submenu");
-      switch (orientation.menu_index) {
-        case 0: {
-          console.log("fetching settings submenu & types");
-          invoke("settings_menu").then((x) => {
-            CURRENT_MENU = x;
-            invoke("setting_types").then((x) => {
-              CURRENT_MENU_TYPES = x;
-              CURRENT_MENU_VALUES = [];
+    const effect = async () => {
+      console.log("submenu trigger");
+      let interval = null;
 
-              CURRENT_MENU.forEach((_, x) => {
-                invoke("setting_value", { setting: x }).then((value) => {
-                  CURRENT_MENU_VALUES[x] = value;
-                });
-              });
+      if (orientation && orientation.menu_item_index !== null) {
+        console.log("finding submenu");
+        switch (orientation.menu_index) {
+          case 0: {
+            console.log("fetching settings submenu & types");
+            const menu = await invoke("settings_menu");
+            CURRENT_MENU = menu;
 
-              invoke("setting_values").then(
-                (value) => (CURRENT_MENU_VALUES = value)
-              );
+            const types = await invoke("setting_types");
+            CURRENT_MENU_TYPES = types;
+            CURRENT_MENU_VALUES = await invoke("setting_values");
 
-              interval = setInterval(() => {
-                invoke("setting_values").then(
-                  (value) => (CURRENT_MENU_VALUES = value)
-                );
-              }, 200);
+            interval = setInterval(async () => {
+              CURRENT_MENU_VALUES = await invoke("setting_values");
+            }, 200);
 
-              console.log(CURRENT_MENU_VALUES);
-            });
-          });
+            console.log(CURRENT_MENU_VALUES);
+          }
         }
       }
-    }
 
-    return () => {
-      interval && clearInterval(interval);
+      return () => {
+        interval && clearInterval(interval);
+      };
     };
+    effect();
   }, [
     orientation &&
       orientation.menu_active &&
