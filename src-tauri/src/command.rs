@@ -27,7 +27,7 @@ pub fn settings_menu(state: State<'_, App>) -> Vec<String> {
 
 #[tauri::command]
 pub fn menu(state: State<'_, App>) -> Vec<String> {
-	state.menu()
+	state.menu().iter().map(ToString::to_string).collect()
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
